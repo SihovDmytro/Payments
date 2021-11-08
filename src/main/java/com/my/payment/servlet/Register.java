@@ -1,6 +1,9 @@
 package com.my.payment.servlet;
 
+import com.my.payment.constants.Message;
 import com.my.payment.db.DBManager;
+import com.my.payment.db.Role;
+import com.my.payment.db.Status;
 import com.my.payment.db.entity.User;
 
 import javax.servlet.ServletException;
@@ -24,35 +27,37 @@ public class Register extends HttpServlet {
         String login=req.getParameter("login");
         String pass=req.getParameter("pass");
         String passR=req.getParameter("pass-repeat");
-
         if(!checkEmail(email)) {
-            req.setAttribute("emailVal","Invalid email");
+            req.setAttribute("emailVal",Message.INVALID_EMAIL);
             continueReg=false;
         }
         if(!checkLogin(login)) {
-            req.setAttribute("loginVal","Invalid login");
+            req.setAttribute("loginVal",Message.INVALID_LOGIN);
             continueReg=false;
         }
         if(!checkPass(pass)) {
-            req.setAttribute("passVal","Invalid password");
+            req.setAttribute("passVal",Message.INVALID_PASS);
             continueReg=false;
         }
         if(!pass.equals(passR)) {
-            req.setAttribute("repeatPVal","Passwords are different");
+            req.setAttribute("repeatPVal",Message.DIFFERENT_PASS);
             continueReg=false;
         }
         DBManager dbManager = DBManager.getInstance();
-        if(dbManager.isUserExists(login))
+        if(dbManager.findUser(login)!=null)
         {
-            req.setAttribute("loginExist","This login already exists");
+            req.setAttribute("loginExist",Message.LOGIN_EXISTS);
             continueReg=false;
         }
-        if(!continueReg)
-        {
-            req.getRequestDispatcher("registration.jsp").forward(req,resp);
+        if(continueReg) {
+            User user = new User(login, Role.USER.getId(), pass, email, Status.ACTIVE);
+            if (dbManager.addUser(user)) {
+                req.setAttribute("isSuccess",Message.USER_CREATED);
+            } else {
+                req.setAttribute("isSuccess", Message.CANNOT_CREATE_USER);
+            }
         }
-        User user;
-
+        req.getRequestDispatcher("registration.jsp").forward(req,resp);
 
     }
     private boolean checkEmail(String text)

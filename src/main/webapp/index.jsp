@@ -8,6 +8,10 @@
 </head>
 <body>
     <form action="cabinet" method="post">
+        <c:if test="${not empty requestScope.wrongData}">
+            ${requestScope.wrongData}
+            <br>
+        </c:if>
     <div>
         <br/>
         <label for="login"><b>Login</b></label>

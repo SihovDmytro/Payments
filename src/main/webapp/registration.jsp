@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sign in</title>
+<title>Sign up</title>
 <link href="myStyle.css" rel = "stylesheet" type = "">
 <body>
 	<form action="register" method="post">
@@ -28,6 +28,10 @@
 				${requestScope.loginExist}
 				<br>
 			</c:if>
+            <c:if test="${not empty requestScope.isSuccess}">
+                ${requestScope.isSuccess}
+                <br>
+            </c:if>
 		</div>
 	  <div class="container">
 		<h1 >Register</h1>
@@ -48,8 +52,8 @@
 		<button type="submit" class="registerbtn">Register</button>
 	  </div>
 
-	  <div class="container signin">
-		<p>Already have an account? <a href="index.jsp">Sign in</a>.</p>
+	  <div class="container signup">
+		<p>Already have an account? <a href="index.jsp">Sign up</a>.</p>
 	  </div>
     </form>
 </body>
