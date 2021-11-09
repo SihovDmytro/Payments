@@ -1,19 +1,19 @@
-package com.my.payment.servlet;
+package com.my.payment.command;
 
 import com.my.payment.constants.Message;
+import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.entity.User;
 
-import java.io.*;
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-@WebServlet(value = "/cabinet")
-public class CabinetServlet extends HttpServlet {
-    public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType("text/html");
+public class LoginCommand implements Command{
+    @Override
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         HttpSession s = request.getSession();
+        String forward;
         System.out.println(s);
         String login =  request.getParameter("login");
         String password = request.getParameter("pass");
@@ -23,13 +23,12 @@ public class CabinetServlet extends HttpServlet {
         if(!dbManager.try2Login(login,password))
         {
             request.setAttribute("wrongData", Message.INVALID_CREDENTIALS);
-            request.getRequestDispatcher("loginPage.jsp").forward(request,response);
+            forward= Path.LoginPage;
+            return forward;
         }
         User user = dbManager.findUser(login);
         s.setAttribute("currUser",user);
         request.getRequestDispatcher("account.jsp").forward(request,response);
-    }
-
-    public void destroy() {
+        return null;
     }
 }

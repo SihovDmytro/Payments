@@ -3,8 +3,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sign up</title>
-<link href="myStyle.css" rel = "stylesheet" type = "">
+	<title>Sign up</title>
+	<link href="myStyle.css" rel = "stylesheet" type = "">
+</head>
 <body>
 	<form action="register" method="post">
 		<div>
@@ -53,9 +54,8 @@
 	  </div>
 
 	  <div class="container signup">
-		<p>Already have an account? <a href="index.jsp">Sign up</a>.</p>
+		<p>Already have an account? <a href="loginPage.jsp">Sign up</a>.</p>
 	  </div>
     </form>
 </body>
-</head>
 </html>

@@ -1,36 +1,36 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setBundle basename="localization_en_US"/>
 <html>
 <head>
-    <link href="myStyle.css" rel = "stylesheet">
+    <link href="myStyle.css" rel = "stylesheet" type = "">
     <title>Your cabinet</title>
 </head>
 <body>
-    <div class="tabs">
-        <div class="tabs__nav">
-            <button class="tabs__nav-btn" type="button" data-tab="#tab_1">Cabinet</button>
-            <button class="tabs__nav-btn" type="button" data-tab="#tab_2">Cards</button>
+    <form>
+        <div class="my-menu">
+            <a href="account.jsp" class="active" >
+                <fmt:message key="menu.cabinet"/>
+            </a>
+            <a href="cards.jsp">
+                <fmt:message key="menu.cards"/>
+            </a>
+            <a href="loginPage.jsp">
+                <fmt:message key="menu.leave"/>
+            </a>
         </div>
-        <div class="tabs__content">
-
-            <div class="tabs__item" id="tab_1">
-                <h3>Your cabinet</h3><br>
-                ${sessionScope.currUser.login}
-                <hr>
-                ${sessionScope.currUser.password}
-                <hr>
-                ${sessionScope.currUser.roleID}
-                <hr>
-                ${sessionScope.currUser.email}
-                <hr>
-                ${sessionScope.currUser.status}
-            </div>
-            <div class="tabs__item" id="tab_2">
-                <h1>Cards</h1>
-                <p>12463512345123</p>
-            </div>
+        <div class="my-info">
+            <p>
+            <span style="font-weight: 600"><fmt:message key="label.login" /></span>:
+            ${sessionScope.currUser.login}
+            <hr>
+            <span style="font-weight: 600"><fmt:message key="label.email"/></span>:
+            ${sessionScope.currUser.email}
+            <hr>
+            <span style="font-weight: 600"><fmt:message key="label.status"/></span>:
+            ${sessionScope.currUser.status}
+            </p>
         </div>
-    </div>
-    <script src="myScript.js"></script>
+    </form>
 </body>
 </html>
