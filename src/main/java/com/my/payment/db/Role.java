@@ -2,8 +2,6 @@ package com.my.payment.db;
 
 import com.my.payment.db.entity.User;
 
-import java.util.Locale;
-
 public enum Role {
     USER(1), ADMIN(2);
     private final int id;
@@ -13,7 +11,7 @@ public enum Role {
     }
     public static Role getRole(User user) {
         int roleID = user.getRoleID();
-        return Role.values()[roleID];
+        return Role.values()[roleID-1];
     }
     public String getName()
     {

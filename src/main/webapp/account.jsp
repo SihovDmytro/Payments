@@ -15,7 +15,7 @@
             <a href="cards.jsp">
                 <fmt:message key="menu.cards"/>
             </a>
-            <a href="loginPage.jsp">
+            <a href="controller?command=logout">
                 <fmt:message key="menu.leave"/>
             </a>
         </div>

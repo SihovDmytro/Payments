@@ -9,7 +9,7 @@ public class Message {
     public static final String LOGIN_EXISTS="This login already exists";
     public static final String USER_CREATED="User has successfully been created!";
     public static final String CANNOT_CREATE_USER="Cannot create user";
-
+    public static final String NO_SUCH_COMMAND="No such command";
     public static final String CABINET="Cabinet";
 
 

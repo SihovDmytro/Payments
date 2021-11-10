@@ -7,8 +7,9 @@
 	<link href="myStyle.css" rel = "stylesheet" type = "">
 </head>
 <body>
-	<form action="register" method="post">
+	<form action="controller" method="post">
 		<div>
+			<input type="hidden" name="command" value="registration"/>
 			<c:if test="${not empty requestScope.emailVal}">
 				${requestScope.emailVal}
 				<br>
