@@ -1,19 +1,29 @@
 package com.my.payment.db;
 
+import com.my.payment.Controller;
+import com.my.payment.constants.Message;
+import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class DBManager {
-    private static final String FIND_USER="SELECT * FROM user WHERE login=?";
+    private static final Logger LOG = LogManager.getLogger(DBManager.class);
+    private static final String FIND_USER="SELECT * FROM user WHERE BINARY login=?";
     private static final String ADD_USER="INSERT INTO user (login, roles_id, pass, email, status) VALUES (?,?,?,?,?)";
-    private static final String TRY_TO_LOGIN="SELECT * FROM user WHERE login=? AND pass=?";
+    private static final String TRY_TO_LOGIN="SELECT * FROM user WHERE BINARY login=? AND BINARY pass=?";
+    private static final String GET_CARDS_FOR_USER="SELECT c.name,c.number,c.end_date,c.cvv,c.balance,c.status FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE BINARY login=?";
     private static DBManager dbManager;
-    private static String connectionUrl;
     private DataSource ds;
     private  DBManager()
     {
@@ -22,7 +32,9 @@ public class DBManager {
             initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             ds = (DataSource)envContext.lookup("jdbc/MyDB");
+            LOG.trace("Data source ==> "+ds);
         } catch (NamingException e) {
+            LOG.warn(Message.CANNOT_OBTAIN_DATA_SOURCE);
             e.printStackTrace();
         }
     }
@@ -32,6 +44,7 @@ public class DBManager {
         try{
             con = ds.getConnection();
         }catch (SQLException exception) {
+            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION);
             exception.printStackTrace();
         }
         return con;
@@ -54,6 +67,7 @@ public class DBManager {
             try {
                 rs.close();
             } catch (SQLException exception) {
+                LOG.warn(Message.CANNOT_CLOSE_RESULT_SET);
                 exception.printStackTrace();
             }
         }
@@ -63,6 +77,7 @@ public class DBManager {
             try {
                 st.close();
             } catch (SQLException exception) {
+                LOG.warn(Message.CANNOT_CLOSE_STATEMENT);
                 exception.printStackTrace();
             }
         }
@@ -72,6 +87,7 @@ public class DBManager {
             try {
                 con.close();
             } catch (SQLException exception) {
+                LOG.warn(Message.CANNOT_CLOSE_CONNECTION);
                 exception.printStackTrace();
             }
         }
@@ -90,6 +106,7 @@ public class DBManager {
                 return new User(rs.getString(2), rs.getInt(3), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()));
             }
         }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_FIND_USER);
             exception.printStackTrace();
         }
         finally {
@@ -112,6 +129,7 @@ public class DBManager {
         int count = ps.executeUpdate();
         if(count>0) return true;
         }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_CREATE_USER);
             exception.printStackTrace();
         }
         finally {
@@ -134,11 +152,39 @@ public class DBManager {
             rs = ps.executeQuery();
             return rs.next();
         }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_LOGIN);
             exception.printStackTrace();
         }
         finally {
             close(con,ps,rs);
         }
         return false;
+    }
+    public List<Card> getCardsForUser(User user)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        List<Card> cards = new ArrayList<>();
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_CARDS_FOR_USER);
+            ps.setString(1,user.getLogin());
+            rs = ps.executeQuery();
+            while(rs.next())
+            {
+                Calendar c = Calendar.getInstance();
+                c.setTime(rs.getDate(3));
+                Card card = new Card(rs.getString(1),rs.getString(2),c,rs.getInt(4),rs.getDouble(5),Status.valueOf(rs.getString(6).toUpperCase()));
+                cards.add(card);
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+            exception.printStackTrace();
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return cards;
     }
 }

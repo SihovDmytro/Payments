@@ -26,6 +26,7 @@ public class Controller extends HttpServlet {
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String commandName = request.getParameter("command");
+
         logger.trace("Parameter command ==>"+commandName);
         Command command = CommandContainer.get(commandName);
         logger.trace("Obtained command ==>"+commandName);
@@ -36,7 +37,7 @@ public class Controller extends HttpServlet {
             logger.warn("Execute exception ==>"+ex);
             request.setAttribute("errorMessage", ex.getMessage());
         }
-        logger.trace("Forward ==>"+forward);
+        logger.trace("Forward ==> "+forward);
         request.getRequestDispatcher(forward).forward(request, response);
     }
 }

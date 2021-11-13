@@ -12,7 +12,7 @@
             <a href="account.jsp" class="active" >
                 <fmt:message key="menu.cabinet"/>
             </a>
-            <a href="cards.jsp">
+            <a href="controller?command=getCards">
                 <fmt:message key="menu.cards"/>
             </a>
             <a href="controller?command=logout">

@@ -1,10 +1,13 @@
 package com.my.payment.command;
 
+import com.my.payment.Controller;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Role;
 import com.my.payment.db.entity.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,28 +16,34 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class LoginCommand implements Command{
+    private static final Logger logger = LogManager.getLogger(LoginCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        logger.debug("LoginCommand starts");
         HttpSession s = request.getSession();
-        String forward;
-        System.out.println(s);
+        String forward=Path.ERROR_PAGE;
         String login =  request.getParameter("login");
+        logger.trace("Request parameter login ==> "+login);
         String password = request.getParameter("pass");
-        System.out.println("login="+login+"\npassword="+password);
+        logger.trace("Request parameter pass ==> "+password);
         DBManager dbManager = DBManager.getInstance();
         if(!dbManager.try2Login(login,password))
         {
-            System.out.println("Error cred");
+            logger.trace("Cannot login");
             request.setAttribute("wrongData", Message.INVALID_CREDENTIALS);
+            logger.trace("forward ==> "+forward);
             forward= Path.LOGIN_PAGE;
             return forward;
         }
+        logger.trace("Login success");
         User user = dbManager.findUser(login);
+        logger.trace("Found in DB user ==> "+user);
         Role userRole = Role.getRole(user);
+        logger.trace("userRole ==> "+userRole);
         forward=Path.USER_CABINET;
-        System.out.println("user="+user);
         s.setAttribute("currUser",user);
         s.setAttribute("userRole",userRole);
+        logger.trace("forward ==> "+forward);
         return forward;
     }
 }
