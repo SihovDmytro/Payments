@@ -1,3 +1,5 @@
 <tr>
-    <td id="footer">&copy; Payments - final project, 2021</td>
+    <td id="footer" style="text-align: center">
+        &copy; Payments - final project, 2021
+    </td>
 </tr>

@@ -1,13 +1,15 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ include file="/WEB-INF/jspf/page.jspf" %>
+<%@ include file="/WEB-INF/jspf/tags.jspf"%>
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Sign up</title>
-	<link href="myStyle.css" rel = "stylesheet" type = "">
-</head>
+<c:set var="title" value="Sign up" scope="page" />
+<%@include file="/WEB-INF/jspf/head.jspf"%>
 <body>
+<table id ="main-container">
+	<tr>
+		<td class="content">
 	<form action="controller" method="post">
+
 		<div>
 			<input type="hidden" name="command" value="registration"/>
 			<c:if test="${not empty requestScope.emailVal}">
@@ -35,28 +37,32 @@
                 <br>
             </c:if>
 		</div>
-	  <div class="container">
-		<h1 >Register</h1>
-		<hr>
-		<label for="email"><b>Email</b></label>
-		<input type="text" placeholder="Enter email" name="email" id="email" required>
+	  	<div class="container">
+			<h1 >Sign up</h1>
+			<hr>
+			<label for="email"><b>Email*</b></label>
+			<input type="text" placeholder="Enter email" name="email" id="email" required maxlength="45"
+			pattern="[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$">
 
-		<label for="Login"><b>Login</b></label>
-		<input type="text" placeholder="Enter login" name="login" id="login" required>
+			<label for="Login"><b>Login*</b></label>
+			<input type="text" placeholder="Enter login" name="login" id="login" required maxlength="20"
+			pattern="^[\w_-]{3,20}$">
+			<script src="myScript.js"></script>
+			<label for="pass"><b>Password*</b></label>
+			<input type="password" placeholder="Enter password" name="pass" id="pass" required minlength="6" maxlength="45" onkeyup='check();'>
 
-		<label for="pass"><b>Password</b></label>
-		<input type="password" placeholder="Enter password" name="pass" id="pass" required>
+			<label for="pass-repeat"><b>Repeat Password*</b></label>
+			<input type="password" placeholder="Repeat password" name="pass-repeat" id="pass-repeat" required minlength="6" maxlength="45" onkeyup='check();'>
+			<span id='message'></span>
+			<hr>
 
-		<label for="pass-repeat"><b>Repeat Password</b></label>
-		<input type="password" placeholder="Repeat password" name="pass-repeat" id="pass-repeat" required>
-		<hr>
-
-		<button type="submit" class="registerbtn">Register</button>
-	  </div>
-
-	  <div class="container signup">
-		<p>Already have an account? <a href="loginPage.jsp">Sign in</a>.</p>
-	  </div>
+			<button type="submit" class="mybtn">Register</button>
+	 	 </div>
+		<p>Already have an account? <a class="center" href="loginPage.jsp">Sign in</a>.</p>
     </form>
+		</td>
+	</tr>
+	<%@include file="WEB-INF/jspf/footer.jspf"%>
+</table>
 </body>
 </html>

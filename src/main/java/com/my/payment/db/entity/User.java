@@ -5,6 +5,7 @@ import com.my.payment.db.Status;
 import javax.jws.soap.SOAPBinding;
 
 public class User {
+    private int userID;
     private String login;
     private int roleID;
     private String password;
@@ -20,6 +21,13 @@ public class User {
                 '}';
     }
 
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
     public String getLogin() {
         return login;
     }
@@ -61,6 +69,15 @@ public class User {
     }
 
     public User(String login, int roleID, String password, String email, Status status) {
+        userID=-1;
+        this.login = login;
+        this.roleID = roleID;
+        this.password = password;
+        this.email = email;
+        this.status = status;
+    }
+    public User(int userID,String login, int roleID, String password, String email, Status status) {
+        this.userID=userID;
         this.login = login;
         this.roleID = roleID;
         this.password = password;

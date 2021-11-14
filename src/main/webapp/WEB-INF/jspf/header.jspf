@@ -1,0 +1,19 @@
+<%@ include file="/WEB-INF/jspf/page.jspf" %>
+<%@ include file="/WEB-INF/jspf/tags.jspf" %>
+<tr>
+    <td id="header">
+        <div id="leftHeader">
+            <a href="controller?command=getUserInfo">
+                <fmt:message key="menu.cabinet"/>
+            </a>
+            <a href="controller?command=getCards">
+                <fmt:message key="menu.cards"/>
+            </a>
+        </div>
+        <div id="rightHeader">
+            <a href="controller?command=logout">
+                <fmt:message key="menu.leave"/>
+            </a>
+        </div>
+    </td>
+</tr>

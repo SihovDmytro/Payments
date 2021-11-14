@@ -46,7 +46,7 @@ public class RegistrationCommand implements Command{
             request.setAttribute("passVal",Message.INVALID_PASS);
             continueReg=false;
         }
-        if(!pass.equals(passR)) {
+        if(!checkPass(passR) || !pass.equals(passR)  ) {
             logger.warn(Message.DIFFERENT_PASS);
             request.setAttribute("repeatPVal",Message.DIFFERENT_PASS);
             continueReg=false;

@@ -22,7 +22,10 @@ public class DBManager {
     private static final String FIND_USER="SELECT * FROM user WHERE BINARY login=?";
     private static final String ADD_USER="INSERT INTO user (login, roles_id, pass, email, status) VALUES (?,?,?,?,?)";
     private static final String TRY_TO_LOGIN="SELECT * FROM user WHERE BINARY login=? AND BINARY pass=?";
-    private static final String GET_CARDS_FOR_USER="SELECT c.name,c.number,c.end_date,c.cvv,c.balance,c.status FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE BINARY login=?";
+    private static final String GET_CARDS_FOR_USER="SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE BINARY login=?";
+    private static final String GET_CARD="SELECT * FROM card WHERE number=? AND end_date=? AND cvv=?";
+    private static final String CREATE_NEW_CARD="INSERT INTO card(name, number,end_date,cvv,balance,status) VALUES(?,?,?,?,?,?)";
+    private static final String ADD_CARD="INSERT INTO user_has_card(user_id,card_id) VALUES(?,?)";
     private static DBManager dbManager;
     private DataSource ds;
     private  DBManager()
@@ -94,6 +97,7 @@ public class DBManager {
     }
     public User findUser(String login)
     {
+        if(login==null) return null;
         PreparedStatement ps = null;
         Connection con = null;
         ResultSet rs = null;
@@ -103,7 +107,7 @@ public class DBManager {
             ps.setString(1,login);
             rs = ps.executeQuery();
             if(rs.next()) {
-                return new User(rs.getString(2), rs.getInt(3), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()));
+                return new User(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()));
             }
         }catch (SQLException exception){
             LOG.warn(Message.CANNOT_FIND_USER);
@@ -174,8 +178,8 @@ public class DBManager {
             while(rs.next())
             {
                 Calendar c = Calendar.getInstance();
-                c.setTime(rs.getDate(3));
-                Card card = new Card(rs.getString(1),rs.getString(2),c,rs.getInt(4),rs.getDouble(5),Status.valueOf(rs.getString(6).toUpperCase()));
+                c.setTime(rs.getDate(4));
+                Card card = new Card(rs.getString(2),rs.getString(3),c,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
                 cards.add(card);
             }
         }catch (SQLException exception){
@@ -186,5 +190,124 @@ public class DBManager {
             close(con,ps,rs);
         }
         return cards;
+    }
+    public boolean addNewCard(Card card, User user)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        card.setCardID(isCardExist(card));
+        try{
+            if(card.getCardID()==-1)
+            {
+                LOG.trace("Create new card");
+                card.setCardID(createCard(card));
+            }
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(ADD_CARD);
+            ps.setInt(1,user.getUserID());
+            ps.setInt(2,card.getCardID());
+            int count = ps.executeUpdate();
+            if(count!=1)
+            {
+                throw new SQLException();
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_ADD_CARD);
+            exception.printStackTrace();
+            return false;
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return true;
+    }
+    private int createCard(Card card)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        int id=-1;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(CREATE_NEW_CARD,Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1,card.getName());
+            ps.setString(2,card.getNumber());
+            ps.setDate(3, new Date(card.getDate().getTimeInMillis()));
+            ps.setInt(4,card.getCvv());
+            ps.setDouble(5,card.getBalance());
+            ps.setString(6,card.getStatus().toString().toLowerCase());
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            if(rs.next())
+            {
+                id=rs.getInt(1);
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+            exception.printStackTrace();
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return id;
+    }
+    private int isCardExist(Card card)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        int id = -1;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_CARD);
+            ps.setString(1, card.getNumber());
+            ps.setDate(2, new Date(card.getDate().getTimeInMillis()));
+            ps.setInt(3,card.getCvv());
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                id=rs.getInt(1);
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+        }
+        finally {
+            close(con,ps,rs);
+        }
+
+        return id;
+    }
+    public boolean findCard(Card card,User user)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_CARDS_FOR_USER);
+            ps.setString(1,user.getLogin());
+            rs = ps.executeQuery();
+            while(rs.next())
+            {
+                String number = rs.getString(3);
+                Calendar c = Calendar.getInstance();
+                c.setTime(rs.getDate(4));
+                int cvv = rs.getInt(5);
+                if(number.equals(card.getNumber()) && cvv==card.getCvv() && c.equals(card.getDate()))
+                {
+                    LOG.trace("Card found");
+                    return true;
+                }
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+            exception.printStackTrace();
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        LOG.trace("Card doesn't found");
+        return false;
     }
 }

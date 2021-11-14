@@ -19,4 +19,11 @@ public class Message {
     public static final String CANNOT_LOGIN="Cannot login";
     public static final String CANNOT_FIND_USER="Cannot find user";
     public static final String CANNOT_OBTAIN_CARDS="Cannot obtain cards";
+    public static final String INVALID_CARD_NAME="Invalid card name";
+    public static final String INVALID_CARD_NUMBER="Invalid card number";
+    public static final String INVALID_CVV="Invalid cvv";
+    public static final String INVALID_EXPIRATION_DATE="Invalid expiration date";
+    public static final String CARD_ALREADY_ADDED="Card already added";
+    public static final String CANNOT_ADD_CARD="Cannot add card";
+    public static final String CARD_ADD_SUCCESS="Card has successfully been added";
 }

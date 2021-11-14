@@ -4,8 +4,10 @@ import com.my.payment.db.Status;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class Card {
+    private int cardID;
     private String name;
     private String number;
     private Calendar date;
@@ -24,7 +26,15 @@ public class Card {
         this.balance = balance;
         this.status = status;
     }
-
+    public Card(int id, String name, String number, Calendar date, int cvv, double balance, Status status) {
+        cardID=id;
+        this.name = name;
+        this.number = number;
+        this.date = date;
+        this.cvv = cvv;
+        this.balance = balance;
+        this.status = status;
+    }
     @Override
     public String toString() {
         return "Card{" +
@@ -36,6 +46,15 @@ public class Card {
                 ", status=" + status +
                 '}';
     }
+
+    public int getCardID() {
+        return cardID;
+    }
+
+    public void setCardID(int cardID) {
+        this.cardID = cardID;
+    }
+
     public String getTextDate(){
         return  String.format("%2s",date.get(Calendar.DAY_OF_MONTH)).replace(' ', '0')+"."+String.format("%2s",date.get(Calendar.MONTH)).replace(' ', '0')+"."+date.get(Calendar.YEAR);
     }
@@ -86,4 +105,5 @@ public class Card {
     public void setStatus(Status status) {
         this.status = status;
     }
+
 }

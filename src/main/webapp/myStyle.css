@@ -1,59 +1,59 @@
-* {box-sizing: border-box}
-.container {
-  padding: 15px;
-  
-}
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: 15px;
-  margin: 5px 0 22px 0;
-  display: inline-block;
-  border: none;
-  background: #f1f1f1;
-}
+/** {box-sizing: border-box}*/
+/*.container {*/
+/*  padding: 15px;*/
+/*}*/
+/*input[type=text], input[type=password] {*/
+/*  width: 100%;*/
+/*  padding: 15px;*/
+/*  margin: 5px 0 22px 0;*/
+/*  display: inline-block;*/
+/*  border: none;*/
+/*  background: #f1f1f1;*/
+/*}*/
 
-input[type=text]:focus, input[type=password]:focus {
-  background-color: #ddd;
-  outline: none;
+/*input[type=text]:focus, input[type=password]:focus {*/
+/*  background-color: #ddd;*/
+/*  outline: none;*/
 
-}
+/*}*/
 hr {
   border: 1px solid #f1f1f1;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
-.registerbtn {
-  background-color: #04AA6D;
-  color: white;
-  padding: 16px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  opacity: 0.9;
-}
+/*.registerbtn {*/
+/*  background-color: #04AA6D;*/
+/*  color: white;*/
+/*  padding: 16px 20px;*/
+/*  margin: 8px 0;*/
+/*  border: none;*/
+/*  cursor: pointer;*/
+/*  width: 100%;*/
+/*  opacity: 0.9;*/
+/*}*/
 
-.registerbtn:hover {
-  opacity:1;
-}
+/*.registerbtn:hover {*/
+/*  opacity:1;*/
+/*}*/
 a {
   color: dodgerblue;
 }
 
-.signup {
-  background-color: #f1f1f1;
-  text-align: center;
-}
+/*.signup {*/
+/*  background-color: #f1f1f1;*/
+/*  text-align: center;*/
+/*}*/
 
 h1{
 	text-align: center;
 }
 
-form{
-	
-	margin-left: 200px;
-	margin-right: 200px;
-}
+/*form{*/
+/*	*/
+/*	margin-left: 200px;*/
+/*	margin-right: 200px;*/
+/*}*/
+
 .loginbtn {
   background-color: #04AA6D;
   color: white;
@@ -69,32 +69,85 @@ form{
   opacity:1;
 }
 
-.register {
-  background-color: #f1f1f1;
- text-align: center;
+/*.my-menu{*/
+/*  overflow: hidden;*/
+/*  background-color: #04AA6D;*/
+/*}*/
+/*.my-menu a{*/
+/*  float: left;*/
+/*  color: #f2f2f2;*/
+/*  text-align: center;*/
+/*  padding: 14px 16px;*/
+/*  text-decoration: none;*/
+/*  font-size: 17px;*/
+/*}*/
+/*.my-menu a:hover {*/
+/*  background-color: #ddd;*/
+/*  color: black;*/
+/*}*/
+
+/*.active{*/
+/*  background-color: #04AA6D;*/
+/*  color: white;*/
+/*}*/
+/*.my-info{*/
+/*    font-weight: 600;*/
+/*}*/
+
+
+table {
+  border-collapse:collapse;
+}
+td {
+  border:1px solid black;
+  padding: 2px;
+}
+body {
+  margin: 0;
+}
+#main-container {
+  width: 100%;
+  height: 100%;
 }
 
-.my-menu{
-  overflow: hidden;
-  background-color: #04AA6D;
+/***************************************************************
+Header style (TD tag in the first top row)
+***************************************************************/
+#header {
+  background: #AAAAFF;
+  padding: 0px;
 }
-.my-menu a{
+
+/***************************************************************
+Style for the left located head menu (DIV tag at left)
+***************************************************************/
+#leftHeader {
+  background: #AAAAFF;
   float: left;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-.my-menu a:hover {
-  background-color: #ddd;
-  color: black;
+  margin-left: 10px;
+  padding: 2px;
 }
 
-.active{
-  background-color: #04AA6D;
-  color: white;
+/***************************************************************
+Style for the right located head menu (DIV tag at right)
+***************************************************************/
+#rightHeader {
+  background: #AAAAFF;
+  float: right;
+  text-align: right;
+  margin-right: 10px;
+  padding: 2px;
 }
-.my-info{
-    font-weight: 600;
+
+/***************************************************************
+Content styles (TD tag in the main middle row)
+***************************************************************/
+.content {
+  height: 100%;
+  background: #BBBBFF;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  text-align: left;
+  vertical-align: top;
 }
