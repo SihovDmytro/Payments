@@ -3,6 +3,7 @@ package com.my.payment.db;
 import com.my.payment.Controller;
 import com.my.payment.constants.Message;
 import com.my.payment.db.entity.Card;
+import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,10 +13,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DBManager {
     private static final Logger LOG = LogManager.getLogger(DBManager.class);
@@ -26,6 +27,9 @@ public class DBManager {
     private static final String GET_CARD="SELECT * FROM card WHERE number=? AND end_date=? AND cvv=?";
     private static final String CREATE_NEW_CARD="INSERT INTO card(name, number,end_date,cvv,balance,status) VALUES(?,?,?,?,?,?)";
     private static final String ADD_CARD="INSERT INTO user_has_card(user_id,card_id) VALUES(?,?)";
+    private static final String GET_PAYMENTS="SELECT c1.*,c2.*, p.date, p.amount, p.status FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c1.id=? OR c2.id=?";
+    private static final String GET_CARD_BY_ID="SELECT * FROM card WHERE id=?";
+    private static final String GET_CARD_BY_NUMBER="SELECT * FROM card WHERE number=?";
     private static DBManager dbManager;
     private DataSource ds;
     private  DBManager()
@@ -179,7 +183,7 @@ public class DBManager {
             {
                 Calendar c = Calendar.getInstance();
                 c.setTime(rs.getDate(4));
-                Card card = new Card(rs.getString(2),rs.getString(3),c,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
+                Card card = new Card(rs.getInt(1), rs.getString(2),rs.getString(3),c,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
                 cards.add(card);
             }
         }catch (SQLException exception){
@@ -221,6 +225,32 @@ public class DBManager {
             close(con,ps,rs);
         }
         return true;
+    }
+    public Card getCardByID(int id)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        Card card=null;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_CARD_BY_ID);
+            ps.setInt(1,id);
+            rs = ps.executeQuery();
+            if (rs.next())
+            {
+                Calendar c = Calendar.getInstance();
+                c.setTime(rs.getDate(4));
+                card = new Card(rs.getInt(1), rs.getString(2),rs.getString(3),c,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+            exception.printStackTrace();
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return card;
     }
     private int createCard(Card card)
     {
@@ -309,5 +339,67 @@ public class DBManager {
         }
         LOG.trace("Card doesn't found");
         return false;
+    }
+
+    public List<Payment> getPayments(int cardID)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        List<Payment> payments = new ArrayList<>();
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_PAYMENTS);
+            ps.setInt(1,cardID);
+            ps.setInt(2,cardID);
+            rs = ps.executeQuery();
+            while(rs.next())
+            {
+                Calendar c1 = Calendar.getInstance();
+                c1.setTime(rs.getDate(4));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2),rs.getString(3),c1,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(rs.getDate(11));
+                Card cardto = new Card(rs.getInt(8),rs.getString(9),rs.getString(10),c2,rs.getInt(12),rs.getDouble(13),Status.valueOf(rs.getString(14).toUpperCase()));
+                Calendar paymentDate = Calendar.getInstance();
+                String textDate =  rs.getString(15);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                java.util.Date date = sdf.parse(textDate);
+                paymentDate.setTime(date);
+                payments.add(new Payment(cardFrom,cardto,paymentDate,rs.getDouble(16),PaymentStatus.valueOf(rs.getString(17).toUpperCase())));
+            }
+        }catch (SQLException | ParseException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+            exception.printStackTrace();
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return payments;
+    }
+    public Card getCardByNumber(String number)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        Card cardFrom=null;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(GET_CARD_BY_NUMBER);
+            ps.setString(1, number);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                Calendar c = Calendar.getInstance();
+                c.setTime(rs.getDate(4));
+                cardFrom = new Card(rs.getInt(1), rs.getString(2),rs.getString(3),c,rs.getInt(5),rs.getDouble(6),Status.valueOf(rs.getString(7).toUpperCase()));
+            }
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+        }
+        finally {
+            close(con,ps,rs);
+        }
+        return cardFrom;
     }
 }

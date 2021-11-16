@@ -1,9 +1,9 @@
-<%@ include file="WEB-INF/jspf/tags.jspf"%>
-<%@ include file="WEB-INF/jspf/page.jspf"%>
+<%@ include file="/WEB-INF/jspf/tags.jspf"%>
+<%@ include file="/WEB-INF/jspf/page.jspf"%>
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Login" scope="page" />
-<%@ include file="WEB-INF/jspf/head.jspf"%>
+<%@ include file="/WEB-INF/jspf/head.jspf"%>
 
 <body>
     <table id="main-container">
@@ -30,7 +30,7 @@
                 </form>
             </td>
         </tr>
-        <%@include file="WEB-INF/jspf/footer.jspf"%>
+        <%@include file="/WEB-INF/jspf/footer.jspf"%>
     </table>
 </body>
 </html>

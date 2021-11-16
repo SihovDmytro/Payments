@@ -25,10 +25,11 @@ public class GetCardsCommand implements Command{
         HttpSession s = request.getSession();
         User user = (User) s.getAttribute("currUser");
         DBManager dbManager = DBManager.getInstance();
-        cards= dbManager.getCardsForUser(user);
+        cards = dbManager.getCardsForUser(user);
         request.setAttribute("listCards",cards);
         LOG.trace("Obtained cards ==> "+cards);
         String forward = Path.CARDS_PAGE;
+
         return forward;
     }
 }

@@ -106,4 +106,16 @@ public class Card {
         this.status = status;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return cardID == card.cardID && cvv == card.cvv && Double.compare(card.balance, balance) == 0 && number.equals(card.number) && date.equals(card.date) && status == card.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cardID, number, date, cvv, balance, status);
+    }
 }

@@ -18,6 +18,9 @@ public class CommandContainer {
         commands.put("getUserInfo",new GetUserInfoCommand());
         commands.put("getNewCardPage",new GetNewCardPageCommand());
         commands.put("addCard",new NewCardCommand());
+        commands.put("getPayments",new GetPaymentsForCardCommand());
+        commands.put("makePayment",new MakePaymentCommand());
+        commands.put("commitPayment",new CommitPaymentCommand());
 
     }
     public static Command get(String commandName)

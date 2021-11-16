@@ -13,6 +13,7 @@
                 <table id="cards_table">
                     <thead>
                     <tr>
+                        <td></td>
                         <td>Name</td>
                         <td>Number</td>
                         <td>Balance</td>
@@ -23,6 +24,9 @@
                     </thead>
                     <c:forEach var="item" items="${requestScope.listCards}">
                         <tr>
+                            <td>
+                                <a href="controller?command=getPayments&cardItem=${item.cardID}">History</a>
+                            </td>
                             <td>${item.name}</td>
                             <td>${item.number}</td>
                             <td>${item.balance}</td>
