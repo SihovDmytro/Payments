@@ -56,7 +56,7 @@ public class Card {
     }
 
     public String getTextDate(){
-        return  String.format("%2s",date.get(Calendar.DAY_OF_MONTH)).replace(' ', '0')+"."+String.format("%2s",date.get(Calendar.MONTH)).replace(' ', '0')+"."+date.get(Calendar.YEAR);
+        return date.get(Calendar.YEAR)+"-"+String.format("%2s",date.get(Calendar.MONTH)+1).replace(' ', '0')+"-"+String.format("%2s",date.get(Calendar.DAY_OF_MONTH)).replace(' ', '0');
     }
     public String getName() {
         return name;

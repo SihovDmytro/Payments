@@ -3,7 +3,9 @@ package com.my.payment.command;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
+import com.my.payment.db.PaymentStatus;
 import com.my.payment.db.entity.Card;
+import com.my.payment.db.entity.Payment;
 import com.mysql.cj.protocol.PacketReceivedTimeHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,13 +57,34 @@ public class CommitPaymentCommand implements Command {
             request.setAttribute("invalidAmount",Message.INVALID_AMOUNT);
             valid=false;
         }
+        if(numberFrom.equals(numberTo))
+        {
+            LOG.trace("Enter another card");
+            request.setAttribute("anotherCard","Enter another card");
+            valid=false;
+        }
         if(valid)
         {
+            DBManager dbManager = DBManager.getInstance();
             LOG.trace("Valid parameters");
-            forward=Path.PAYMENT_SUCCESS;
+            if(numberFrom.equals(numberTo))
+            {
+                LOG.trace("Enter another card");
+                request.setAttribute("anotherCard","Enter another card");
+
+            }
+            Payment payment = new Payment(dbManager.getCardByNumber(numberFrom),dbManager.getCardByNumber(numberTo), Calendar.getInstance(),amount, PaymentStatus.PREPARED);
+            LOG.trace("Formed payment ==> "+payment);
+            if(dbManager.commitPayment(payment))
+                forward=Path.PAYMENT_SUCCESS;
+            else {
+                LOG.warn("Payment error");
+                request.setAttribute("errorMessage","Payment error");
+            }
         }else {
             LOG.trace("Invalid parameters");
-            forward="controller?command=makePayment&fromID="+request.getParameter("fromID");
+            forward=Path.MAKE_PAYMENT_PAGE;
+            //forward="controller?command=makePayment&fromID="+request.getParameter("fromID");
         }
         return forward;
     }

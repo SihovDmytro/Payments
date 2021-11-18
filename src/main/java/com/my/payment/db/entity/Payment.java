@@ -60,8 +60,7 @@ public class Payment {
         this.status = status;
     }
     public String getTextDate(){
-        return  String.format("%2s",date.get(Calendar.DAY_OF_MONTH)).replace(' ', '0')+"."+String.format("%2s",date.get(Calendar.MONTH)+1).replace(' ', '0')+"."+date.get(Calendar.YEAR);
-    }
+        return date.get(Calendar.YEAR)+"-"+String.format("%2s",date.get(Calendar.MONTH)+1).replace(' ', '0')+"-"+String.format("%2s",date.get(Calendar.DAY_OF_MONTH)).replace(' ', '0');    }
     public String getTextDateTime(){
         String datetime = getTextDate()+" "+String.format("%2s",date.get(Calendar.HOUR_OF_DAY)).replace(' ', '0')+":"+String.format("%2s",date.get(Calendar.MINUTE)).replace(' ', '0')+":"+String.format("%2s",date.get(Calendar.SECOND)).replace(' ', '0');
         return datetime;

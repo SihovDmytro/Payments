@@ -4,6 +4,7 @@ import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
+import com.my.payment.util.Sorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,10 +27,10 @@ public class GetCardsCommand implements Command{
         User user = (User) s.getAttribute("currUser");
         DBManager dbManager = DBManager.getInstance();
         cards = dbManager.getCardsForUser(user);
+
         request.setAttribute("listCards",cards);
         LOG.trace("Obtained cards ==> "+cards);
         String forward = Path.CARDS_PAGE;
-
         return forward;
     }
 }

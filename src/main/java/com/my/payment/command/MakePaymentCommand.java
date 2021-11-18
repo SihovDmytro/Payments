@@ -1,7 +1,9 @@
 package com.my.payment.command;
 
+import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
+import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +38,16 @@ public class MakePaymentCommand implements Command{
             request.setAttribute("errorMessage", "You haven't this card");
             return forward;
         }
+
         DBManager dbManager = DBManager.getInstance();
         Card card = dbManager.getCardByID(fromID);
         LOG.trace("card by id ==> "+card);
+        if(card.getStatus()== Status.BLOCKED)
+        {
+            LOG.trace(Message.CARD_IS_BLOCKED);
+            request.setAttribute("errorMessage", Message.CARD_IS_BLOCKED);
+            return forward;
+        }
         request.setAttribute("fromCard",card);
         return Path.MAKE_PAYMENT_PAGE;
     }

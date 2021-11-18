@@ -26,6 +26,8 @@ public class Message {
     public static final String CARD_ALREADY_ADDED="Card already added";
     public static final String CANNOT_ADD_CARD="Cannot add card";
     public static final String CARD_ADD_SUCCESS="Card has successfully been added";
-    public static final String CANNOT_OBTAIN_HISTORY="Cannot obtain history";
+    public static final String CANNOT_OBTAIN_CARD_INFO="Cannot obtain card info";
     public static final String INVALID_AMOUNT="Invalid amount";
+    public static final String CARD_IS_BLOCKED="This card is blocked";
+    public static final String CANNOT_BLOCK_CARD="Cannot block card";
 }

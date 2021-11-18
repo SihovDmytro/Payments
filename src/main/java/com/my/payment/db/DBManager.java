@@ -30,6 +30,9 @@ public class DBManager {
     private static final String GET_PAYMENTS="SELECT c1.*,c2.*, p.date, p.amount, p.status FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c1.id=? OR c2.id=?";
     private static final String GET_CARD_BY_ID="SELECT * FROM card WHERE id=?";
     private static final String GET_CARD_BY_NUMBER="SELECT * FROM card WHERE number=?";
+    private static final String MAKE_PAYMENT="INSERT INTO payment(card_id_from,card_id_to, date,amount,status) values(?,?,?,?,?)";
+    private static final String TRANSFER="UPDATE card SET balance=balance+ ? WHERE id=?";
+    private static final String BLOCK_CARD="UPDATE card SET status='blocked' WHERE id=?";
     private static DBManager dbManager;
     private DataSource ds;
     private  DBManager()
@@ -401,5 +404,95 @@ public class DBManager {
             close(con,ps,rs);
         }
         return cardFrom;
+    }
+    public boolean commitPayment(Payment payment)
+    {
+        PreparedStatement ps = null;
+        Connection con = null;
+        boolean result = false;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(MAKE_PAYMENT);
+            ps.setInt(1, payment.getFrom().getCardID());
+            ps.setInt(2, payment.getTo().getCardID());
+            Calendar c = payment.getDate();
+            Timestamp ts = new Timestamp(c.getTimeInMillis());
+            ps.setTimestamp(3,ts);
+            ps.setDouble(4,payment.getAmount());
+            ps.setString(5,payment.getStatus().toString().toLowerCase());
+            if(ps.executeUpdate()>0){
+                result=true;
+            }
+            else {
+                throw new SQLException();
+            }
+            withdraw(payment.getFrom().getCardID(),payment.getAmount(),con);
+            transfer(payment.getTo().getCardID(),payment.getAmount(),con);
+            con.commit();
+
+        }catch (SQLException exception){
+            if(con!=null)
+            {
+                try {
+                    con.rollback();
+                }catch (SQLException exception1)
+                {
+                    LOG.warn("Cannot rollback "+exception);
+                }
+            }
+            LOG.warn("Cannot transfer");
+        }
+        finally {
+            close(con);
+            close(ps);
+        }
+        return result;
+    }
+    private void withdraw(int id, double amount,Connection con) throws SQLException {
+        PreparedStatement ps = null;
+        try{
+            ps = con.prepareStatement(TRANSFER);
+            ps.setDouble(1, -amount);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        }
+        finally {
+            close(ps);
+        }
+    }
+    private void transfer(int id, double amount, Connection con) throws SQLException {
+        PreparedStatement ps = null;
+        try{
+            ps = con.prepareStatement(TRANSFER);
+            ps.setDouble(1, amount);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        }
+        finally {
+            close(ps);
+        }
+    }
+    public boolean blockCard(Card card)
+    {
+        boolean result = false;
+        PreparedStatement ps =null;
+        Connection con = null;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(BLOCK_CARD);
+            ps.setInt(1,card.getCardID());
+            int count = ps.executeUpdate();
+            if(count!=1){
+                throw new SQLException();
+            }
+            result=true;
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_BLOCK_CARD);
+        }
+        finally {
+            close(con);
+            close(ps);
+        }
+        return result;
     }
 }

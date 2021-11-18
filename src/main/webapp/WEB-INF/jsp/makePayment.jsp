@@ -19,6 +19,10 @@
                     ${requestScope.invalidAmount}
                     <br>
                 </c:if>
+                <c:if test="${not empty requestScope.anotherCard}">
+                    ${requestScope.anotherCard}
+                    <br>
+                </c:if>
                 <input type="hidden" name="command" value="commitPayment"/>
                 <input type="hidden" name="fromID" value="${requestScope.fromCard.cardID}"/>
                 <div class="container">
@@ -32,7 +36,7 @@
                     <input type="text" placeholder="Enter card number" name="cardNumberTo" id="cardNumberTo" required maxlength="16" minlength="16" onkeypress="return onlyNumberKey(event)">
 
                     <label for="amount"><b>Amount*</b></label>
-                    <input type="number" name="amount" id="amount" required min="1" max="999999999">
+                    <input type="number" name="amount" id="amount" required step="0.01" min="1" max="999999999">
 
                     <hr>
                     <button type="submit" class="mybtn">Commit</button>

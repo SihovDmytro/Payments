@@ -5,6 +5,8 @@ import com.my.payment.command.CommandContainer;
 import com.my.payment.constants.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -37,7 +39,8 @@ public class Controller extends HttpServlet {
             logger.warn("Execute exception ==>"+ex);
             request.setAttribute("errorMessage", ex.getMessage());
         }
-        logger.trace("Forward ==> "+forward);
-        request.getRequestDispatcher(forward).forward(request, response);
+            logger.trace("Forward ==> " + forward);
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(forward);
+            dispatcher.forward(request, response);
     }
 }
