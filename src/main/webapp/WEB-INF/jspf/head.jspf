@@ -3,5 +3,5 @@
     <title>
         ${pageScope.title}
     </title>
-    <link href="myStyle2.css" rel = "stylesheet" media="screen" type="text/css">
+    <link href="myStyle3.css" rel = "stylesheet" media="screen" type="text/css">
 </head>

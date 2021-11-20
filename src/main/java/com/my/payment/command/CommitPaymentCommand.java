@@ -14,6 +14,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -75,8 +76,12 @@ public class CommitPaymentCommand implements Command {
             }
             Payment payment = new Payment(dbManager.getCardByNumber(numberFrom),dbManager.getCardByNumber(numberTo), Calendar.getInstance(),amount, PaymentStatus.PREPARED);
             LOG.trace("Formed payment ==> "+payment);
-            if(dbManager.commitPayment(payment))
-                forward=Path.PAYMENT_SUCCESS;
+            if(dbManager.commitPayment(payment)) {
+                HttpSession s = request.getSession();
+                s.setAttribute("resultTitle", "Success");
+                s.setAttribute("resultMessage", Message.TRANSACTION_SUCCESS);
+                forward=Path.RESULT_PAGE;
+            }
             else {
                 LOG.warn("Payment error");
                 request.setAttribute("errorMessage","Payment error");
@@ -84,7 +89,6 @@ public class CommitPaymentCommand implements Command {
         }else {
             LOG.trace("Invalid parameters");
             forward=Path.MAKE_PAYMENT_PAGE;
-            //forward="controller?command=makePayment&fromID="+request.getParameter("fromID");
         }
         return forward;
     }

@@ -2,6 +2,7 @@ package com.my.payment.db.entity;
 
 import com.my.payment.db.PaymentStatus;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 
 public class Payment {
@@ -64,6 +65,10 @@ public class Payment {
     public String getTextDateTime(){
         String datetime = getTextDate()+" "+String.format("%2s",date.get(Calendar.HOUR_OF_DAY)).replace(' ', '0')+":"+String.format("%2s",date.get(Calendar.MINUTE)).replace(' ', '0')+":"+String.format("%2s",date.get(Calendar.SECOND)).replace(' ', '0');
         return datetime;
+    }
+    public String textAmount()
+    {
+        return new BigDecimal(amount).toPlainString();
     }
     @Override
     public String toString() {

@@ -27,13 +27,13 @@ public class GetPaymentsForCardCommand implements Command{
         int cardID;
         try {
             cardID = Integer.parseInt(request.getParameter("cardItem"));
-            LOG.trace("Parameter cardID ==>"+cardID);
         }catch (NumberFormatException exception)
         {
             LOG.trace(Message.CANNOT_OBTAIN_CARD_INFO);
             request.setAttribute("errorMessage", Message.CANNOT_OBTAIN_CARD_INFO);
             return forward;
         }
+        LOG.trace("Parameter cardID ==>"+cardID);
         if(!checkCardID(cardID,(User) session.getAttribute("currUser")))
         {
             LOG.trace("You haven't this card");
@@ -48,6 +48,7 @@ public class GetPaymentsForCardCommand implements Command{
             request.setAttribute("errorMessage", Message.CARD_IS_BLOCKED);
             return forward;
         }
+        session.setAttribute("currCardID",cardID);
         List<Payment> payments = dbManager.getPayments(cardID);
         LOG.trace("Obtained payments ==> "+payments);
         Sorter.sortPaymentsByDate(payments,true);

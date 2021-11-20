@@ -39,8 +39,13 @@ public class Controller extends HttpServlet {
             logger.warn("Execute exception ==>"+ex);
             request.setAttribute("errorMessage", ex.getMessage());
         }
+        if (forward.equals("resultPage.jsp"))
+        {
+            response.sendRedirect(forward);
+        }else {
             logger.trace("Forward ==> " + forward);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(forward);
             dispatcher.forward(request, response);
+        }
     }
 }

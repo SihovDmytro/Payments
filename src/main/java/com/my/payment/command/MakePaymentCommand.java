@@ -20,17 +20,9 @@ public class MakePaymentCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(MakePaymentCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        int fromID;
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
-        try {
-            fromID = Integer.parseInt(request.getParameter("fromID"));
-        }catch (NumberFormatException exception)
-        {
-            LOG.warn("Cannot parse card id");
-            request.setAttribute("errorMessage","Cannot parse card id");
-            return forward;
-        }
+        int fromID = (int) session.getAttribute("currCardID");
         LOG.trace("fromID parameter ==> "+fromID);
         if(!checkCardID(fromID,(User) session.getAttribute("currUser")))
         {

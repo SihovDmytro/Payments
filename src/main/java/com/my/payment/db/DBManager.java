@@ -33,6 +33,7 @@ public class DBManager {
     private static final String MAKE_PAYMENT="INSERT INTO payment(card_id_from,card_id_to, date,amount,status) values(?,?,?,?,?)";
     private static final String TRANSFER="UPDATE card SET balance=balance+ ? WHERE id=?";
     private static final String BLOCK_CARD="UPDATE card SET status='blocked' WHERE id=?";
+    private static final String TOP_UP_CARD="";
     private static DBManager dbManager;
     private DataSource ds;
     private  DBManager()
@@ -460,17 +461,20 @@ public class DBManager {
             close(ps);
         }
     }
-    private void transfer(int id, double amount, Connection con) throws SQLException {
+    private boolean transfer(int id, double amount, Connection con) throws SQLException {
         PreparedStatement ps = null;
+        boolean result = false;
         try{
             ps = con.prepareStatement(TRANSFER);
             ps.setDouble(1, amount);
             ps.setInt(2, id);
-            ps.executeUpdate();
+            int count = ps.executeUpdate();
+            result = count==1;
         }
         finally {
             close(ps);
         }
+        return result;
     }
     public boolean blockCard(Card card)
     {
@@ -492,6 +496,22 @@ public class DBManager {
         finally {
             close(con);
             close(ps);
+        }
+        return result;
+    }
+    public boolean topUpCard(Card c, double amount)
+    {
+        boolean result = false;
+        PreparedStatement ps =null;
+        Connection con = null;
+        try{
+            con = dbManager.getConnection();
+            result = transfer(c.getCardID(),amount,con);
+        }catch (SQLException exception){
+            LOG.warn(Message.CANNOT_TOP_UP);
+        }
+        finally {
+            close(con);
         }
         return result;
     }

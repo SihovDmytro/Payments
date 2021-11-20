@@ -22,6 +22,7 @@ public class CommandContainer {
         commands.put("makePayment",new MakePaymentCommand());
         commands.put("commitPayment",new CommitPaymentCommand());
         commands.put("blockCard",new BlockCardCommand());
+        commands.put("topUp",new TopUpCommand());
 
     }
     public static Command get(String commandName)

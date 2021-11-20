@@ -5,12 +5,44 @@
 <c:set var="title" value="Your cards" scope="page"/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
-<form>
     <table id="main-container">
         <%@include file="/WEB-INF/jspf/header.jspf"%>
-
         <tr>
             <td class="content">
+                <p>
+                    <span>Card name: </span>
+                    ${requestScope.currCard.name}
+                    <hr>
+                    <span>Card number: </span>
+                    ${requestScope.currCard.number}
+                    <hr>
+                    <span>Expiration date: </span>
+                    ${requestScope.currCard.textDate}
+                     <hr>
+                    <span>Balance: </span>
+                    ${requestScope.currCard.textBalance}
+                    <br>
+                    <form action="controller" method="post">
+                        <input type="hidden" name="command" value="topUp">
+                        <div id="okno" >
+                            <label for="topUp" >Amount</label>
+                            <input type ="number" placeholder="Enter amount" id="topUp" name = "topUp" required step="0.01" min="1" max="999999999"/>
+                            <button type="submit">Top up</button>
+                            <br>
+                            <c:if test="${not empty requestScope.amountLimit}">
+                                ${requestScope.amountLimit}
+                            </c:if>
+                        </div>
+                    </form>
+                    <a href="#okno">Top up balance</a>
+                    <hr>
+                    <span>Status: </span>
+                    ${requestScope.currCard.status.toString()}
+                    <hr>
+                    <span>CVV: </span>
+                    ${requestScope.currCard.cvv}
+                    <hr>
+                </p>
                 <table id="cards_table" class="js-sort-table" >
                 <thead>
                     <tr>
@@ -51,6 +83,5 @@
         <%@ include file="/WEB-INF/jspf/footer.jspf" %>
     </table>
     <hr>
-</form>
 </body>
 </html>
