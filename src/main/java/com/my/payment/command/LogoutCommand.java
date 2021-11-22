@@ -20,7 +20,7 @@ public class LogoutCommand implements Command{
         if (s != null) {
             s.invalidate();
         }
-        logger.debug("Session has been invalidated");
+        logger.debug("Session is invalidated");
         return Path.LOGIN_PAGE;
     }
 }

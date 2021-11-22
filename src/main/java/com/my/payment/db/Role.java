@@ -9,10 +9,10 @@ public enum Role {
     {
         this.id = id;
     }
-    public static Role getRole(User user) {
-        int roleID = user.getRoleID();
-        return Role.values()[roleID-1];
-    }
+//    public static Role getRole(User user) {
+//        int roleID = user.getRoleID();
+//        return Role.values()[roleID-1];
+//    }
     public String getName()
     {
         return name().toLowerCase();

@@ -22,18 +22,9 @@ public class MakePaymentCommand implements Command{
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
-        int fromID = (int) session.getAttribute("currCardID");
-        LOG.trace("fromID parameter ==> "+fromID);
-        if(!checkCardID(fromID,(User) session.getAttribute("currUser")))
-        {
-            LOG.trace("You haven't this card");
-            request.setAttribute("errorMessage", "You haven't this card");
-            return forward;
-        }
-
+        Card card = (Card)session.getAttribute("currCard");
+        LOG.trace("card parameter ==> "+card);
         DBManager dbManager = DBManager.getInstance();
-        Card card = dbManager.getCardByID(fromID);
-        LOG.trace("card by id ==> "+card);
         if(card.getStatus()== Status.BLOCKED)
         {
             LOG.trace(Message.CARD_IS_BLOCKED);
@@ -43,13 +34,5 @@ public class MakePaymentCommand implements Command{
         request.setAttribute("fromCard",card);
         return Path.MAKE_PAYMENT_PAGE;
     }
-    private boolean checkCardID(int id, User user) {
-        DBManager dbManager = DBManager.getInstance();
-        List<Card> cards = dbManager.getCardsForUser(user);
-        for(Card c: cards)
-        {
-            if(c.getCardID()==id) return true;
-        }
-        return false;
-    }
+
 }

@@ -16,20 +16,20 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-public class BlockCardCommand implements Command{
-    private static final Logger LOG = LogManager.getLogger(BlockCardCommand.class);
+public class ChangeCardStatusCommand implements Command{
+    private static final Logger LOG = LogManager.getLogger(ChangeCardStatusCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String forward = Path.ERROR_PAGE;
         HttpSession s = request.getSession();
         int cardID;
         try {
-            cardID = Integer.parseInt(request.getParameter("cardItem"));
+            cardID = Integer.parseInt(request.getParameter("cardID"));
             LOG.trace("Parameter cardID ==>"+cardID);
         }catch (NumberFormatException exception)
         {
-            LOG.trace(Message.CANNOT_BLOCK_CARD);
-            request.setAttribute("errorMessage", Message.CANNOT_BLOCK_CARD);
+            LOG.trace(Message.CANNOT_CHANGE_STATUS);
+            request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
             return forward;
         }
         if(!checkCardID(cardID,(User) s.getAttribute("currUser")))
@@ -38,21 +38,23 @@ public class BlockCardCommand implements Command{
             request.setAttribute("errorMessage", "You haven't this card");
             return forward;
         }
-        DBManager dbManager = DBManager.getInstance();
-        Card card = dbManager.getCardByID(cardID);
-        if(card.getStatus() == Status.BLOCKED)
-        {
-            LOG.trace(Message.CARD_IS_BLOCKED);
-            forward="/controller?command=getCards";
+        Status newStatus = null;
+        try{
+            newStatus = Status.valueOf(request.getParameter("newStatus"));
+            LOG.trace("Status ==> "+newStatus.toString());
+        }catch (NumberFormatException e){
+            LOG.trace("Cannot parse newStatus");
+            request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
             return forward;
         }
-        if(dbManager.blockCard(card))
+        DBManager dbManager = DBManager.getInstance();
+        if(dbManager.changeCardStatus(cardID,newStatus))
         {
-            forward="/controller?command=getCards";
-            LOG.trace("The card was blocked");
-        }
-        else {
-            request.setAttribute("errorMessage",Message.CANNOT_BLOCK_CARD);
+            LOG.trace("Card status is changed");
+            forward=Path.GET_CARDS_COMMAND;
+
+        }else {
+            request.setAttribute("errorMessage",Message.CANNOT_CHANGE_STATUS);
         }
         return forward;
     }

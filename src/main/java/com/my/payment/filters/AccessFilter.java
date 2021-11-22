@@ -2,6 +2,8 @@ package com.my.payment.filters;
 
 import com.my.payment.constants.Path;
 import com.my.payment.db.Role;
+import com.my.payment.db.Status;
+import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,6 +61,11 @@ public class AccessFilter implements Filter {
         if (userRole == null) {
             return false;
         }
+        User user = (User) session.getAttribute("currUser");
+        if (user == null || user.getStatus() == Status.BLOCKED) {
+            return false;
+        }
+
         return accessMap.get(userRole).contains(commandName) || commons.contains(commandName);
     }
     private List<String> asList(String str) {

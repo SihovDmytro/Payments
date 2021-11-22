@@ -1,5 +1,6 @@
 package com.my.payment.db.entity;
 
+import com.my.payment.db.Role;
 import com.my.payment.db.Status;
 
 import javax.jws.soap.SOAPBinding;
@@ -7,7 +8,7 @@ import javax.jws.soap.SOAPBinding;
 public class User {
     private int userID;
     private String login;
-    private int roleID;
+    private Role role;
     private String password;
     private String email;
     private Status status;
@@ -15,7 +16,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "login='" + login + '\'' +
-                ", roleID=" + roleID +
+                ", role=" + role.toString() +
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 '}';
@@ -36,12 +37,12 @@ public class User {
         this.login = login;
     }
 
-    public int getRoleID() {
-        return roleID;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoleID(int roleID) {
-        this.roleID = roleID;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getPassword() {
@@ -68,18 +69,18 @@ public class User {
         this.status = status;
     }
 
-    public User(String login, int roleID, String password, String email, Status status) {
+    public User(String login, Role role, String password, String email, Status status) {
         userID=-1;
         this.login = login;
-        this.roleID = roleID;
+        this.role = role;
         this.password = password;
         this.email = email;
         this.status = status;
     }
-    public User(int userID,String login, int roleID, String password, String email, Status status) {
+    public User(int userID,String login, Role role, String password, String email, Status status) {
         this.userID=userID;
         this.login = login;
-        this.roleID = roleID;
+        this.role = role;
         this.password = password;
         this.email = email;
         this.status = status;

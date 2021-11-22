@@ -1,5 +1,6 @@
 <%@ include file="/WEB-INF/jspf/page.jspf" %>
 <%@ include file="/WEB-INF/jspf/tags.jspf" %>
+<%@ page import="com.my.payment.db.Role" %>
 <tr>
     <td id="header">
         <div id="leftHeader">
@@ -9,6 +10,11 @@
             <a href="controller?command=getCards">
                 <fmt:message key="menu.cards"/>
             </a>
+            <c:if test="${sessionScope.userRole == Role.ADMIN}">
+                <a href="controller?command=getUsers">
+                    <fmt:message key="menu.users"/>
+                </a>
+            </c:if>
         </div>
         <div id="rightHeader">
             <a href="controller?command=logout">

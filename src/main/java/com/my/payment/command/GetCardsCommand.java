@@ -2,6 +2,7 @@ package com.my.payment.command;
 
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
+import com.my.payment.db.Role;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
 import com.my.payment.util.Sorter;
@@ -22,15 +23,19 @@ public class GetCardsCommand implements Command{
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        List<Card> cards;
+        LOG.trace("GetCardsCommand starts");
+        List<Card> cards=null;
         HttpSession s = request.getSession();
         User user = (User) s.getAttribute("currUser");
+        Role role = (Role) s.getAttribute("userRole");
         DBManager dbManager = DBManager.getInstance();
-        cards = dbManager.getCardsForUser(user);
+        if(role == Role.USER)
+            cards = dbManager.getCardsForUser(user);
+        else if(role == Role.ADMIN)
+            cards = dbManager.getAllCards();
 
         request.setAttribute("listCards",cards);
         LOG.trace("Obtained cards ==> "+cards);
-        String forward = Path.CARDS_PAGE;
-        return forward;
+        return Path.CARDS_PAGE;
     }
 }

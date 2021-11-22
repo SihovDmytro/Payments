@@ -15,11 +15,11 @@
         <filter-class>com.my.payment.filters.AccessFilter</filter-class>
         <init-param>
             <param-name>admin</param-name>
-            <param-value>getCards getUserInfo logout getNewCardPage addCard getPayments makePayment commitPayment blockCard topUp</param-value>
+            <param-value>getCards getUserInfo getNewCardPage addCard getPayments makePayment commitPayment changeCardStatus topUp getUsers changeUserStatus</param-value>
         </init-param>
         <init-param>
             <param-name>user</param-name>
-            <param-value>getCards getUserInfo logout getNewCardPage addCard getPayments makePayment commitPayment blockCard topUp</param-value>
+            <param-value>getCards getUserInfo logout getNewCardPage addCard getPayments makePayment commitPayment changeCardStatus topUp</param-value>
         </init-param>
         <init-param>
             <param-name>common</param-name>
@@ -27,7 +27,7 @@
         </init-param>
         <init-param>
             <param-name>out-of-control</param-name>
-            <param-value>login registration</param-value>
+            <param-value>login registration logout</param-value>
         </init-param>
     </filter>
 </web-app>

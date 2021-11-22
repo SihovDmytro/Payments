@@ -2,7 +2,7 @@
 <body>
 ERROR PAGE
 
-${requestScope.errorMessage}
-
+${requestScope.errorMessage}<br>
+<a href="loginPage.jsp">Login Page</a>
 </body>
 </html>

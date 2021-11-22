@@ -38,12 +38,11 @@ public class LoginCommand implements Command{
         logger.trace("Login success");
         User user = dbManager.findUser(login);
         logger.trace("Found in DB user ==> "+user);
-        Role userRole = Role.getRole(user);
+        Role userRole = user.getRole();
         logger.trace("userRole ==> "+userRole);
-        forward=Path.USER_CABINET;
+        forward=Path.GET_CABINET_COMMAND;
         s.setAttribute("currUser",user);
         s.setAttribute("userRole",userRole);
-        logger.trace("forward ==> "+forward);
         return forward;
     }
 }

@@ -59,7 +59,7 @@ public class RegistrationCommand implements Command{
             continueReg=false;
         }
         if(continueReg) {
-            User user = new User(login, Role.USER.getId(), pass, email, Status.ACTIVE);
+            User user = new User(login, Role.USER, pass, email, Status.ACTIVE);
             logger.warn("Formed user ==> "+user);
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);

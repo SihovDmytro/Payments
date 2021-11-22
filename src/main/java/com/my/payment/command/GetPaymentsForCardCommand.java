@@ -1,13 +1,15 @@
 package com.my.payment.command;
 
 import com.my.payment.constants.Message;
+import com.my.payment.constants.NumericConst;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
-import com.my.payment.util.Sorter;
+import com.my.payment.util.SortOrder;
+import com.my.payment.util.SortType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,26 +44,72 @@ public class GetPaymentsForCardCommand implements Command{
         }
         DBManager dbManager = DBManager.getInstance();
         Card card = dbManager.getCardByID(cardID);
-        if(card.getStatus()==null || card.getStatus()== Status.BLOCKED)
+        if(card==null)
+        {
+            request.setAttribute("errorMessage", Message.CANNOT_OBTAIN_CARD_INFO);
+            return forward;
+        }
+        if(card.getStatus()== Status.BLOCKED)
         {
             LOG.trace(Message.CARD_IS_BLOCKED);
             request.setAttribute("errorMessage", Message.CARD_IS_BLOCKED);
             return forward;
         }
-        session.setAttribute("currCardID",cardID);
-        List<Payment> payments = dbManager.getPayments(cardID);
-        LOG.trace("Obtained payments ==> "+payments);
-        Sorter.sortPaymentsByDate(payments,true);
-        LOG.trace("Payments after sorting==> "+payments);
-        request.setAttribute("payments",payments);
-        if(card!=null)
+        session.setAttribute("currCard",card);
+
+        int currentPage;
+        int recordsPerPage;
+        try {
+            currentPage = Integer.parseInt(request.getParameter("currentPage"));
+        }catch (NumberFormatException e)
         {
-            request.setAttribute("currCard",card);
-            forward=Path.CARD_INFO;
+            LOG.trace("Cannot parse current page ");
+            currentPage=1;
         }
-        else {
-            request.setAttribute("errorMessage", Message.CANNOT_OBTAIN_CARD_INFO);
+        try {
+            recordsPerPage = Integer.parseInt(request.getParameter("recordsPerPage"));
+        }catch (NumberFormatException e)
+        {
+            LOG.trace("Cannot parse recordsPerPage");
+            recordsPerPage= NumericConst.defPageSize;
         }
+        if(recordsPerPage<1) recordsPerPage=1;
+        if(currentPage<1) currentPage=1;
+        String sortType = request.getParameter("sort");
+        LOG.trace("Sort type ==> "+sortType);
+        String sortOrder = request.getParameter("sortOrder");
+        LOG.trace("Sort order ==> "+sortOrder);
+        SortType st = SortType.BY_DATE;
+        SortOrder so = SortOrder.DESCENDING;
+        try {
+            st = SortType.valueOf(sortType);
+        }catch (IllegalArgumentException | NullPointerException e){
+            LOG.trace("Use default sort type");
+        }
+        request.setAttribute("sortType",st);
+        try {
+            so = SortOrder.valueOf(sortOrder);
+        }catch (IllegalArgumentException | NullPointerException e){
+            LOG.trace("Use default sort order");
+        }
+        LOG.trace("RecordsPerPage ==> "+recordsPerPage);
+        LOG.trace("CurrentPage ==> "+currentPage);
+        request.setAttribute("sortOrder",so);
+        int offset = recordsPerPage*(currentPage-1);
+        LOG.trace("offset ==> "+offset);
+        List<Payment> paymentsOnPage = dbManager.getPayments(cardID,recordsPerPage,offset,st,so);
+        int pageCount = (int)Math.ceil((double) dbManager.getPaymentsSize(cardID) / recordsPerPage);
+        if(pageCount<1) pageCount=1;
+        request.setAttribute("payments",paymentsOnPage);
+        LOG.trace("Payments ==> "+paymentsOnPage);
+        request.setAttribute("pageCount",pageCount);
+        LOG.trace("PageCount ==> "+pageCount);
+        request.setAttribute("currentPage",currentPage);
+
+        request.setAttribute("recordsPerPage",recordsPerPage);
+
+
+        forward=Path.CARD_INFO;
         return forward;
     }
 

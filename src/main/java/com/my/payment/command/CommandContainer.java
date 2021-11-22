@@ -21,8 +21,11 @@ public class CommandContainer {
         commands.put("getPayments",new GetPaymentsForCardCommand());
         commands.put("makePayment",new MakePaymentCommand());
         commands.put("commitPayment",new CommitPaymentCommand());
-        commands.put("blockCard",new BlockCardCommand());
+        commands.put("changeCardStatus",new ChangeCardStatusCommand());
         commands.put("topUp",new TopUpCommand());
+
+        commands.put("getUsers",new GetUsersCommand());
+        commands.put("changeUserStatus",new ChangeUserStatusCommand());
 
     }
     public static Command get(String commandName)

@@ -16,12 +16,15 @@
             <span ><fmt:message key="label.email"/></span>:
             ${sessionScope.currUser.email}
             <hr>
+            <span ><fmt:message key="label.role"/></span>:
+            ${sessionScope.userRole.toString()}
+            <hr>
             <span ><fmt:message key="label.status"/></span>:
             ${sessionScope.currUser.status}
             </p>
         </td>
     </tr>
-    <%@ include file="/WEB-INF/jspf/footer.jspf" %>
+
 </table>
 </body>
 </html>

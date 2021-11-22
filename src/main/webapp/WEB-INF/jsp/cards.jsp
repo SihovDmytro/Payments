@@ -6,12 +6,11 @@
 <c:set var="title" value="Your cards" scope="page"/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
-<form>
     <table id="main-container">
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
-                <table id="cards_table" class="js-sort-table">
+                <table class="js-sort-table">
                     <thead>
                     <tr>
                         <td></td>
@@ -38,23 +37,47 @@
                             <td>${item.cvv}</td>
                             <td>${item.status.toString()}</td>
                             <td>
-                                <c:if test="${item.status == Status.BLOCKED}">
-                                    <a href="">Send a request to unlock</a>
-                                </c:if>
-                                <c:if test="${item.status == Status.ACTIVE}">
-                                    <a href="controller?command=blockCard&cardItem=${item.cardID}">Block the card</a>
-                                </c:if>
+                                <form action="controller" method="post">
+                                    <input type="hidden" name="command" value="changeCardStatus">
+                                    <input type="hidden" name="cardID" value="${item.cardID}">
+                                    <c:choose>
+                                        <c:when test="${item.status == Status.ACTIVE}">
+                                            <input type="hidden" name="newStatus" value="${Status.BLOCKED}">
+                                            <button type="submit">Block the card</button>
+                                        </c:when>
+                                        <c:when test="${item.status == Status.BLOCKED}">
+                                            <c:if test="${sessionScope.userRole == Role.USER}">
+                                                <input type="hidden" name="newStatus" value="${Status.UNBLOCK_REQUEST}">
+                                                <button type="submit">Unblock card</button>
+                                            </c:if>
+                                            <c:if test="${sessionScope.userRole == Role.ADMIN}">
+                                                <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
+                                                <button type="submit">Unblock card</button>
+                                            </c:if>
+                                        </c:when>
+                                        <c:when test="${item.status == Status.UNBLOCK_REQUEST}">
+                                            <c:if test="${sessionScope.userRole == Role.USER}">
+                                                Unblock request is sent
+                                            </c:if>
+                                            <c:if test="${sessionScope.userRole == Role.ADMIN}">
+                                                <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
+                                                <button type="submit">Unblock card</button>
+                                            </c:if>
+                                        </c:when>
+                                    </c:choose>
+                                </form>
                             </td>
                         </tr>
                     </c:forEach>
                 </table>
-                <a href="controller?command=getNewCardPage">Add new card</a>
+                <c:if test="${sessionScope.userRole == Role.USER}">
+                    <a href="controller?command=getNewCardPage">Add new card</a>
+                </c:if>
             </td>
         </tr>
         <script src="${pageContext.request.contextPath}/sort-table.js"></script>
-        <%@ include file="/WEB-INF/jspf/footer.jspf" %>
+
     </table>
     <hr>
-</form>
 </body>
 </html>

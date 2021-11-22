@@ -24,17 +24,9 @@ public class TopUpCommand implements Command{
         LOG.debug("TopUpCommand start");
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
-        int cardID = (int) session.getAttribute("currCardID");
-        LOG.trace("cardID parameter ==> "+cardID);
-        if(!checkCardID(cardID,(User) session.getAttribute("currUser")))
-        {
-            LOG.trace("You haven't this card");
-            request.setAttribute("errorMessage", "You haven't this card");
-            return forward;
-        }
+        Card card = (Card) session.getAttribute("currCard");
+        LOG.trace("card parameter ==> "+card);
         DBManager dbManager = DBManager.getInstance();
-        Card card = dbManager.getCardByID(cardID);
-        LOG.trace("card by id ==> "+card);
         if(card.getStatus()== Status.BLOCKED)
         {
             LOG.trace(Message.CARD_IS_BLOCKED);
@@ -76,14 +68,5 @@ public class TopUpCommand implements Command{
     private boolean checkAmount(double amount,Card card)
     {
         return !(card.getBalance() + amount > 999999999);
-    }
-    private boolean checkCardID(int id, User user) {
-        DBManager dbManager = DBManager.getInstance();
-        List<Card> cards = dbManager.getCardsForUser(user);
-        for(Card c: cards)
-        {
-            if(c.getCardID()==id) return true;
-        }
-        return false;
     }
 }

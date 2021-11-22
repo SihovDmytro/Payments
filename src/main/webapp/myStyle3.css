@@ -19,6 +19,12 @@
     width: 100%;
     opacity: 0.9;
 }
+.outgoing {
+    background-color: #ffe3ea;
+}
+.incoming {
+     background-color: #cee6f5;
+}
 .center {
     text-align: center;
     vertical-align: middle;

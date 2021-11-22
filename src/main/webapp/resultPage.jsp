@@ -14,11 +14,14 @@
             <a href="loginPage.jsp">Login Page</a>
             <c:if test="${not empty sessionScope.currUser}">
                 <a href="controller?command=getUserInfo">User Page</a>
-                <a href="controller?command=getPayments&cardItem=${sessionScope.currCardID}">Card Page</a>
+                <c:if test="${not empty sessionScope.currCard}">
+                    <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}">Card Page</a>
+                </c:if>
             </c:if>
+            <c:remove var="${sessionScope.resultMessage}"/>
         </td>
     </tr>
-    <%@include file="/WEB-INF/jspf/footer.jspf"%>
+
 </table>
 </body>
 </html>

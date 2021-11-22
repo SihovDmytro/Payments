@@ -12,7 +12,7 @@
                 Payment success!
             </td>
         </tr>
-        <%@ include file="/WEB-INF/jspf/footer.jspf" %>
+
     </table>
     <hr>
 </form>
