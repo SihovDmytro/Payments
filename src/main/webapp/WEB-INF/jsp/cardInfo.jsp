@@ -1,6 +1,7 @@
 <%@include file="/WEB-INF/jspf/page.jspf"%>
 <%@include file="/WEB-INF/jspf/tags.jspf"%>
-<fmt:setBundle basename="localization_en_US"/>
+<%@ page import="com.my.payment.db.PaymentStatus" %>
+<%@ page import="com.my.payment.constants.Path" %>
 <html>
 <c:set var="title" value="Your card" scope="page"/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
@@ -9,18 +10,18 @@
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
-                <p>
-                    <span>Card name: </span>
-                    ${sessionScope.currCard.name}
-                    <hr>
-                    <span>Card number: </span>
-                    ${sessionScope.currCard.number}
-                    <hr>
-                    <span>Expiration date: </span>
-                    ${sessionScope.currCard.textDate}
-                     <hr>
-                    <span>Balance: </span>
-                    ${sessionScope.currCard.textBalance}
+                <span>Card name: </span>
+                ${sessionScope.currCard.name}
+                <hr>
+                <span>Card number: </span>
+                ${sessionScope.currCard.number}
+                <hr>
+                <span>Expiration date: </span>
+                ${sessionScope.currCard.textDate}
+                 <hr>
+                <span>Balance: </span>
+                ${sessionScope.currCard.balance}
+                <c:if test="${sessionScope.userRole==Role.USER}">
                     <br>
                     <form action="controller" method="post">
                         <input type="hidden" name="command" value="topUp">
@@ -35,129 +36,66 @@
                         </div>
                     </form>
                     <a href="#okno">Top up balance</a>
-                    <hr>
-                    <span>Status: </span>
-                    ${sessionScope.currCard.status.toString()}
-                    <hr>
-                    <span>CVV: </span>
-                    ${sessionScope.currCard.cvv}
-                    <hr>
-                </p>
-
-                <div class="center">
-                    Page ${requestScope.currentPage} of ${requestScope.pageCount}
-                    <br>
-
-                    <c:choose>
-                        <c:when test="${requestScope.currentPage - 1 > 0}">
-                            <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}&currentPage=${requestScope.currentPage-1}&recordsPerPage=${requestScope.recordsPerPage}&sort=${requestScope.sortType.toString()}&sortOrder=${requestScope.sortOrder.toString()}">Previous</a>
-                        </c:when>
-                        <c:otherwise>
-                            Previous
-                        </c:otherwise>
-                    </c:choose>
-
-                    <c:forEach var="p" begin="1" end="${requestScope.pageCount}">
-                        <c:choose>
-                            <c:when test="${requestScope.currentPage == p}">${p}</c:when>
-                            <c:otherwise>
-                                <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}&currentPage=${p}&recordsPerPage=${requestScope.recordsPerPage}&sort=${requestScope.sortType.toString()}&sortOrder=${requestScope.sortOrder.toString()}">${p}</a>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:forEach>
-
-                    <c:choose>
-                        <c:when test="${requestScope.currentPage + 1 <= requestScope.pageCount}">
-                            <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}&currentPage=${requestScope.currentPage+1}&recordsPerPage=${requestScope.recordsPerPage}&sort=${requestScope.sortType.toString()}&sortOrder=${requestScope.sortOrder.toString()}">Next</a>
-                        </c:when>
-                        <c:otherwise>
-                            Next
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-                <form action="controller" >
-                    <table class="settings-table center">
-                        <tr>
-                            <td>Records per page</td>
-                            <td>Sort</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="hidden" name="command" value="getPayments">
-                                <input type="hidden" name="cardItem" value="${sessionScope.currCard.cardID}">
-
-                                <br>
-                                <select name="recordsPerPage" id = "recordsPerPage" onchange="this.form.submit()">
-                                        <option value="10" ${10 == requestScope.recordsPerPage ? 'selected' : ''}>10</option>
-                                        <option value="20" ${20 == requestScope.recordsPerPage ? 'selected' : ''}>20</option>
-                                        <option value="100" ${100 == requestScope.recordsPerPage ? 'selected' : ''}>100</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="radio" id="byNumberFrom" name="sort" value="BY_NUMBER_FROM" ${"BY_NUMBER_FROM" == requestScope.sortType.toString() ? 'checked' : ''}>
-                                <label for="byNumberFrom">By number from</label>
-
-                                <input type="radio" id="byNumberTo" name="sort" value="BY_NUMBER_TO" ${"BY_NUMBER_TO" == requestScope.sortType.toString() ? 'checked' : ''}>
-                                <label for="byNumberTo">By number to</label>
-
-                                <input type="radio" id="byDate" name="sort" value="BY_DATE" ${"BY_DATE" == requestScope.sortType.toString() ? 'checked' : ''}>
-                                <label for="byDate">By date</label>
-                                <br>
-                                <input type="radio" id="ascOrder" name="sortOrder" value="ASCENDING" ${"ASCENDING" == requestScope.sortOrder.toString() ? 'checked' : ''}>
-                                <label for="ascOrder">Ascending</label>
-
-                                <input type="radio" id="descOrder" name="sortOrder" value="DESCENDING" ${"DESCENDING" == requestScope.sortOrder.toString() ? 'checked' : ''}>
-                                <label for="descOrder">Descending</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>
-                                <button class="center" type="submit" >Submit</button>
-                            </td>
-                        </tr>
-                    </table>
-
-                </form>
-
-                <table  class="js-sort-table" >
+                </c:if>
+                <hr>
+                <span>Status: </span>
+                ${sessionScope.currCard.status.toString()}
+                <hr>
+                <span>CVV: </span>
+                ${sessionScope.currCard.cvv}
+                <hr>
+                <table id = "mydatatable" class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th class="js-sort-string">In/Out</th>
-                        <th class="js-sort-number">Number from</th>
-                        <th class="js-sort-number">Number to</th>
-                        <th class="js-sort-number">Amount</th>
-                        <th class="js-sort-date">Date</th>
-                        <th class="js-sort-string">Status</th>
+                        <th>In/Out</th>
+                        <th>Number from</th>
+                        <th>Number to</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th></th>
                     </tr>
                 </thead>
+                    <tbody>
                     <c:forEach var="item" items="${requestScope.payments}">
                             <c:if test="${item.from.cardID==sessionScope.currCard.cardID}">
-                                <tr class="outgoing center">
+                                <tr class="outgoing">
                                     <td>outgoing</td>
                                     <td>${item.from.number}</td>
                                     <td>${item.to.number}</td>
                                     <td>${item.amount}</td>
                                     <td>${item.textDateTime}</td>
-                                    <td>${item.status.toString()}</td>
+                                    <td>
+                                            ${item.status.toString()}
+                                        <c:if test="${item.status == PaymentStatus.PREPARED and item.from.balance>=item.amount and sessionScope.userRole==Role.USER}">
+                                            <br>
+                                            <form action="controller" method="post">
+                                                <input type="hidden" name="command" value="commitPayment">
+                                                <input type="hidden" name="paymentID" value="${item.id}">
+                                                <button type="submit">Commit</button>
+                                            </form>
+                                        </c:if>
+                                    </td>
                                 </tr>
                             </c:if>
                             <c:if test="${item.to.cardID==sessionScope.currCard.cardID}">
-                                <tr class="incoming center" >
+                                <tr class="incoming" >
                                     <td>incoming</td>
                                     <td>${item.from.number}</td>
                                     <td>${item.to.number}</td>
                                     <td>${item.amount}</td>
                                     <td>${item.textDateTime}</td>
-                                    <td>${item.status.toString()}</td>
+                                    <td></td>
                                 </tr>
                             </c:if>
                     </c:forEach>
+                    </tbody>
                 </table>
-                <a href="controller?command=makePayment">Make a payment</a>
+                <c:if test="${sessionScope.userRole==Role.USER}">
+                    <a href="${Path.MAKE_PAYMENT_PAGE}">Make a payment</a>
+                </c:if>
             </td>
         </tr>
-        <script src="${pageContext.request.contextPath}/sort-table.js"></script>
+        <%@ include file="/WEB-INF/jspf/scripts.jspf"%>
 
     </table>
     <hr>

@@ -1,25 +1,69 @@
-body {
-    margin: 0;
+
+
+.outgoing {
+    background-color: #ffe3ea !important;
+}
+.incoming {
+    background-color: #cee6f5 !important;
 }
 
-table {
-    border-collapse:collapse;
+.center {
+    text-align: center;
+    vertical-align: middle;
 }
 
-td {
-    border:1px solid black;
-    padding: 2px;
+#okno {
+    width: 300px;
+    height: 125px;
+    text-align: center;
+    padding: 15px;
+    border: 3px solid #0000cc;
+    border-radius: 10px;
+    color: #0000cc;
+    display: none;
 }
-hr {
-    border: 1px solid #f1f1f1;
-    margin-bottom: 15px;
-}
-#header, #footer, .content {
-    border: 0px solid;
-}
-#main-container {
+#okno:target {display: block;}
+
+#okno input[type=number] {
     width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #f1f1f1;
+}
+
+.mybtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+.content {
     height: 100%;
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-top: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
 }
 
 #header {
@@ -50,38 +94,10 @@ hr {
     padding: 2px;
 }
 
-.content {
-    height: 100%;
-    padding-left: 200px;
-    padding-right: 200px;
-    padding-top: 10px;
-    text-align: left;
-    vertical-align: top;
+#header, #footer, .content {
+    border: 0px solid;
 }
-
-.mybtn {
-    background-color: #04AA6D;
-    color: white;
-    padding: 16px 20px;
-    margin: 8px 0;
-    border: none;
-    cursor: pointer;
+#main-container {
     width: 100%;
-    opacity: 0.9;
+    height: 100%;
 }
-.center {
-    text-align: center;
-    vertical-align: middle;
-}
-
-#okno .content {
-    width: 300px;
-    height: 50px;
-    text-align: center;
-    padding: 15px;
-    border: 3px solid #0000cc;
-    border-radius: 10px;
-    color: #0000cc;
-    display: none;
-}
-#okno .content :target {display: block;}

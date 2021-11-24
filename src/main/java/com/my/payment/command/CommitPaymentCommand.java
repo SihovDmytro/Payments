@@ -16,9 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CommitPaymentCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(CommitPaymentCommand.class);
@@ -26,74 +23,43 @@ public class CommitPaymentCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.trace("CommitPaymentCommand starts");
-        String numberFrom = request.getParameter("cardNumberFrom");
-        LOG.trace("numberFrom parameter ==> " + numberFrom);
-        String numberTo = request.getParameter("cardNumberTo");
-        LOG.trace("numberTo parameter ==> " + numberTo);
         String forward = Path.ERROR_PAGE;
-        double amount;
+        int paymentID;
         try {
-            LOG.trace("amount parameter ==> " + request.getParameter("amount"));
-            amount = Double.parseDouble(request.getParameter("amount"));
+            LOG.trace("paymentID parameter ==> " + request.getParameter("paymentID"));
+            paymentID = Integer.parseInt(request.getParameter("paymentID"));
         } catch (NumberFormatException exception) {
-            LOG.warn("Cannot parse amount");
-            request.setAttribute("errorMessage", Message.INVALID_AMOUNT);
+            LOG.warn("Cannot parse paymentID");
+            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
             return forward;
         }
-        if (!checkNumber(numberFrom)) {
-            LOG.trace(Message.INVALID_CARD_NUMBER);
-            request.setAttribute("errorMessage", Message.INVALID_CARD_NUMBER);
+
+        DBManager dbManager = DBManager.getInstance();
+        Payment payment = dbManager.getPaymentByID(paymentID);
+        LOG.trace("Formed payment ==> " + payment);
+        if(payment==null)
+        {
+            LOG.warn("Cannot get payment from DB");
+            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
             return forward;
         }
-        boolean valid = true;
-        if (!checkNumber(numberTo)) {
-            LOG.trace(Message.INVALID_CARD_NUMBER);
-            request.setAttribute("invalidCardToNumber", Message.INVALID_CARD_NUMBER);
-            valid = false;
+        if(payment.getFrom().getBalance()<payment.getAmount())
+        {
+            LOG.warn(Message.HAVE_NO_MONEY);
+            request.setAttribute("errorMessage", Message.HAVE_NO_MONEY);
+            return forward;
         }
-        if (!checkAmount(amount, numberFrom)) {
-            LOG.trace(Message.INVALID_AMOUNT);
-            request.setAttribute("invalidAmount", Message.INVALID_AMOUNT);
-            valid = false;
-        }
-        if (numberFrom.equals(numberTo)) {
-            LOG.trace("Enter another card");
-            request.setAttribute("anotherCard", "Enter another card");
-            valid = false;
-        }
-        if (valid) {
-            DBManager dbManager = DBManager.getInstance();
-            LOG.trace("Valid parameters");
-            Payment payment = new Payment(dbManager.getCardByNumber(numberFrom), dbManager.getCardByNumber(numberTo), Calendar.getInstance(), amount, PaymentStatus.PREPARED);
-            LOG.trace("Formed payment ==> " + payment);
-            if (dbManager.commitPayment(payment)) {
-                HttpSession s = request.getSession();
-                s.setAttribute("resultTitle", "Success");
-                s.setAttribute("resultMessage", Message.TRANSACTION_SUCCESS);
-                forward = Path.RESULT_PAGE;
-            } else {
-                LOG.warn("Payment error");
-                request.setAttribute("errorMessage", "Payment error");
-            }
+        HttpSession session = request.getSession();
+        if(dbManager.commitPayment(payment))
+        {
+            LOG.trace("Transaction complete ");
+            session.setAttribute("resultTitle", "Success");
+            session.setAttribute("resultMessage", Message.TRANSACTION_SUCCESS);
+            forward = Path.RESULT_PAGE;
         } else {
-            LOG.trace("Invalid parameters");
-            forward = Path.MAKE_PAYMENT_COMMAND;
+            LOG.warn("Payment error");
+            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
         }
         return forward;
-    }
-
-    private boolean checkAmount(double amount, String number) {
-        boolean check = !(amount < 1) && !(amount > 999999999);
-        DBManager dbManager = DBManager.getInstance();
-        Card card = dbManager.getCardByNumber(number);
-        return card.getBalance() >= amount;
-    }
-
-    private boolean checkNumber(String txt) {
-        if (txt == null) return false;
-        Pattern p = Pattern.compile("^\\d{16}$");
-        Matcher m = p.matcher(txt);
-        DBManager dbManager = DBManager.getInstance();
-        return m.find() && txt.length() == 16 && dbManager.getCardByNumber(txt) != null;
     }
 }

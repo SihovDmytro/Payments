@@ -3,6 +3,7 @@ package com.my.payment.command;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
+import com.my.payment.db.Role;
 import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
@@ -32,7 +33,8 @@ public class ChangeCardStatusCommand implements Command{
             request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
             return forward;
         }
-        if(!checkCardID(cardID,(User) s.getAttribute("currUser")))
+        User user = (User) s.getAttribute("currUser");
+        if(user.getRole()!= Role.ADMIN && !checkCardID(cardID,user))
         {
             LOG.trace("You haven't this card");
             request.setAttribute("errorMessage", "You haven't this card");
@@ -59,6 +61,7 @@ public class ChangeCardStatusCommand implements Command{
         return forward;
     }
     private boolean checkCardID(int id, User user) {
+
         DBManager dbManager = DBManager.getInstance();
         List<Card> cards = dbManager.getCardsForUser(user);
         for(Card c: cards)

@@ -1,5 +1,6 @@
 <%@ include file="/WEB-INF/jspf/tags.jspf"%>
 <%@ include file="/WEB-INF/jspf/page.jspf"%>
+<%@ page import="com.my.payment.constants.Path" %>
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="Login" scope="page" />
@@ -10,8 +11,8 @@
         <tr >
             <td class="content">
                 <form action="controller" method="post">
-                    <c:if test="${not empty requestScope.wrongData}">
-                        ${requestScope.wrongData}
+                    <c:if test="${not empty sessionScope.wrongData}">
+                        ${sessionScope.wrongData}
                         <br>
                     </c:if>
                     <br/>
@@ -26,8 +27,9 @@
 
                     <hr>
                     <button type="submit" class="mybtn" value="Login">Login</button>
-                    <p > <a href="registration.jsp">Create account</a>.</p>
+                    <p> <a href="${Path.REGISTRATION_PAGE}">Create account</a>.</p>
                 </form>
+                <c:remove var="wrongData" scope="session"/>
             </td>
         </tr>
 

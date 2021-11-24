@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,31 +32,32 @@ public class RegistrationCommand implements Command{
         String passR=request.getParameter("pass-repeat");
         logger.trace("Request parameter pass-repeat ==> "+passR);
         String forward = Path.ERROR_PAGE;
+        HttpSession session = request.getSession();
         if(!checkEmail(email)) {
             logger.warn(Message.INVALID_EMAIL);
-            request.setAttribute("emailVal", Message.INVALID_EMAIL);
+            session.setAttribute("emailVal", Message.INVALID_EMAIL);
             continueReg=false;
         }
         if(!checkLogin(login)) {
             logger.warn(Message.INVALID_LOGIN);
-            request.setAttribute("loginVal",Message.INVALID_LOGIN);
+            session.setAttribute("loginVal",Message.INVALID_LOGIN);
             continueReg=false;
         }
         if(!checkPass(pass)) {
             logger.warn(Message.INVALID_PASS);
-            request.setAttribute("passVal",Message.INVALID_PASS);
+            session.setAttribute("passVal",Message.INVALID_PASS);
             continueReg=false;
         }
         if(!checkPass(passR) || !pass.equals(passR)  ) {
             logger.warn(Message.DIFFERENT_PASS);
-            request.setAttribute("repeatPVal",Message.DIFFERENT_PASS);
+            session.setAttribute("repeatPVal",Message.DIFFERENT_PASS);
             continueReg=false;
         }
         DBManager dbManager = DBManager.getInstance();
         if(dbManager.findUser(login)!=null)
         {
             logger.warn(Message.LOGIN_EXISTS);
-            request.setAttribute("loginExist",Message.LOGIN_EXISTS);
+            session.setAttribute("loginExist",Message.LOGIN_EXISTS);
             continueReg=false;
         }
         if(continueReg) {
@@ -63,14 +65,13 @@ public class RegistrationCommand implements Command{
             logger.warn("Formed user ==> "+user);
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);
-                request.setAttribute("isSuccess",Message.USER_CREATED);
+                session.setAttribute("isSuccess",Message.USER_CREATED);
             } else {
-                request.setAttribute("isSuccess", Message.CANNOT_CREATE_USER);
+                session.setAttribute("isSuccess", Message.CANNOT_CREATE_USER);
             }
         }
         else logger.warn(Message.CANNOT_CREATE_USER);
-        forward=Path.REGISTRATION_PAGE;
-        logger.warn("forward ==> "+forward);
+        forward="/"+Path.REGISTRATION_PAGE;
         return forward;
     }
     private boolean checkEmail(String text)

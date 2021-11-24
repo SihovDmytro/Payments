@@ -8,7 +8,7 @@ public class Message {
     public static final String DIFFERENT_PASS="Passwords are different";
     public static final String LOGIN_EXISTS="This login already exists";
     public static final String USER_CREATED="User is successfully created!";
-    public static final String CANNOT_CREATE_USER="User hasn't been created";
+    public static final String CANNOT_CREATE_USER="Cannot create user";
     public static final String NO_SUCH_COMMAND="No such command";
     public static final String CANNOT_OBTAIN_DATA_SOURCE="Cannot obtain data source";
     public static final String CANNOT_OBTAIN_USERS="Cannot obtain users";
@@ -33,4 +33,7 @@ public class Message {
     public static final String CANNOT_TOP_UP="Cannot top up the card";
     public static final String TOP_UP_SUCCESS="Your card is replenished";
     public static final String TRANSACTION_SUCCESS="The transaction is made";
+    public static final String CANNOT_MAKE_PAYMENT="Cannot make payment";
+    public static final String HAVE_NO_MONEY="You don't have enough money on your card";
+    public static final String PAYMENT_PREPARED="Payment is prepared";
 }

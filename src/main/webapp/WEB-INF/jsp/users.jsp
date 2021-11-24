@@ -9,16 +9,17 @@
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
-                <table class="js-sort-table">
+                <table id = "mydatatable" class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <td class="js-sort-string">Login</td>
-                        <td class="js-sort-string">Role</td>
-                        <td class="js-sort-string">Email</td>
-                        <td class="js-sort-string">Status</td>
-                        <td></td>
+                        <th>Login</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th></th>
                     </tr>
                     </thead>
+                    <tbody>
                     <c:forEach var="item" items="${requestScope.users}">
                         <tr>
                             <td>${item.login}</td>
@@ -46,10 +47,11 @@
                             </td>
                         </tr>
                     </c:forEach>
+                    </tbody>
                 </table>
             </td>
         </tr>
-        <script src="${pageContext.request.contextPath}/sort-table.js"></script>
+        <%@ include file="/WEB-INF/jspf/scripts.jspf"%>
 
     </table>
     <hr>

@@ -6,19 +6,31 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 
 public class Payment {
-
+    int id;
     Card from;
     Card to;
     double amount;
     Calendar date;
     PaymentStatus status;
 
-    public Payment(Card from, Card to, Calendar date,double amount, PaymentStatus status) {
+    public Payment(Card from, Card to,Calendar date, double amount, PaymentStatus status) {
         this.from = from;
-        this.amount=amount;
         this.to = to;
+        this.amount = amount;
         this.date = date;
         this.status = status;
+    }
+    public Payment(int id, Card from, Card to,Calendar date, double amount, PaymentStatus status) {
+        this.id = id;
+        this.from = from;
+        this.to = to;
+        this.amount = amount;
+        this.date = date;
+        this.status = status;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public double getAmount() {
@@ -70,10 +82,12 @@ public class Payment {
     {
         return new BigDecimal(amount).toPlainString();
     }
+
     @Override
     public String toString() {
         return "Payment{" +
-                "from=" + from +
+                "id=" + id +
+                ", from=" + from +
                 ", to=" + to +
                 ", amount=" + amount +
                 ", date=" + getTextDateTime() +

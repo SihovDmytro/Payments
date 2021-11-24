@@ -21,6 +21,6 @@ public class LogoutCommand implements Command{
             s.invalidate();
         }
         logger.debug("Session is invalidated");
-        return Path.LOGIN_PAGE;
+        return "/"+Path.LOGIN_PAGE;
     }
 }

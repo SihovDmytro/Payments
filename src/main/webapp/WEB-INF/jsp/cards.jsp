@@ -1,7 +1,6 @@
 <%@include file="/WEB-INF/jspf/page.jspf"%>
 <%@include file="/WEB-INF/jspf/tags.jspf"%>
 <%@ page import="com.my.payment.db.Status" %>
-<fmt:setBundle basename="localization_en_US"/>
 <html>
 <c:set var="title" value="Your cards" scope="page"/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
@@ -10,28 +9,32 @@
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
-                <table class="js-sort-table">
+                <table class="table table-striped table-bordered" id = "mydatatable" >
                     <thead>
                     <tr>
-                        <td></td>
-                        <td class="js-sort-string">Name</td>
-                        <td class="js-sort-number">Number</td>
-                        <td class="js-sort-number">Balance</td>
-                        <td class="js-sort-date">Expiration date</td>
-                        <td class="js-sort-number">CVV</td>
-                        <td class="js-sort-string">Status</td>
-                        <td></td>
+                        <th>Name</th>
+                        <th>Number</th>
+                        <th>Balance</th>
+                        <th>Expiration date</th>
+                        <th >CVV</th>
+                        <th >Status</th>
+                        <th></th>
                     </tr>
                     </thead>
+                    <tbody>
                     <c:forEach var="item" items="${requestScope.listCards}">
                         <tr>
-                            <td>
-                                <c:if test="${item.status == Status.ACTIVE}">
-                                    <a href="controller?command=getPayments&cardItem=${item.cardID}">Card info</a>
-                                </c:if>
-                            </td>
                             <td>${item.name}</td>
-                            <td>${item.number}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${item.status == Status.ACTIVE or sessionScope.userRole==Role.ADMIN}">
+                                        <a href="controller?command=getPayments&cardItem=${item.cardID}">${item.number}</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${item.number}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
                             <td>${item.balance}</td>
                             <td>${item.textDate}</td>
                             <td>${item.cvv}</td>
@@ -69,15 +72,15 @@
                             </td>
                         </tr>
                     </c:forEach>
+                    </tbody>
                 </table>
                 <c:if test="${sessionScope.userRole == Role.USER}">
                     <a href="controller?command=getNewCardPage">Add new card</a>
                 </c:if>
             </td>
         </tr>
-        <script src="${pageContext.request.contextPath}/sort-table.js"></script>
-
     </table>
     <hr>
+    <%@ include file="/WEB-INF/jspf/scripts.jspf"%>
 </body>
 </html>

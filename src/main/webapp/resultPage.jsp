@@ -18,7 +18,8 @@
                     <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}">Card Page</a>
                 </c:if>
             </c:if>
-            <c:remove var="${sessionScope.resultMessage}"/>
+            <c:remove var="resultMessage" scope="session"/>
+            <c:remove var="resultTitle" scope="session"/>
         </td>
     </tr>
 

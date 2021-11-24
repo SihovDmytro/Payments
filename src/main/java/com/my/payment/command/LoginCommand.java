@@ -30,9 +30,9 @@ public class LoginCommand implements Command{
         if(!dbManager.try2Login(login,password))
         {
             logger.trace("Cannot login");
-            request.setAttribute("wrongData", Message.INVALID_CREDENTIALS);
+            s.setAttribute("wrongData", Message.INVALID_CREDENTIALS);
             logger.trace("forward ==> "+forward);
-            forward= Path.LOGIN_PAGE;
+            forward= "/"+Path.LOGIN_PAGE;
             return forward;
         }
         logger.trace("Login success");
@@ -40,7 +40,7 @@ public class LoginCommand implements Command{
         logger.trace("Found in DB user ==> "+user);
         Role userRole = user.getRole();
         logger.trace("userRole ==> "+userRole);
-        forward=Path.GET_CABINET_COMMAND;
+        forward="/"+Path.USER_CABINET;
         s.setAttribute("currUser",user);
         s.setAttribute("userRole",userRole);
         return forward;

@@ -1,10 +1,11 @@
 <%@ include file="/WEB-INF/jspf/page.jspf" %>
 <%@ include file="/WEB-INF/jspf/tags.jspf" %>
 <%@ page import="com.my.payment.db.Role" %>
+<%@ page import="com.my.payment.constants.Path" %>
 <tr>
     <td id="header">
         <div id="leftHeader">
-            <a href="controller?command=getUserInfo">
+            <a href="${Path.USER_CABINET}">
                 <fmt:message key="menu.cabinet"/>
             </a>
             <a href="controller?command=getCards">

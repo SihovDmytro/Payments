@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/jspf/page.jspf" %>
 <%@ include file="/WEB-INF/jspf/tags.jspf" %>
-<fmt:setBundle basename="localization_en_US"/>
+
 <html>
 <c:set var="title" value="Your cabinet" scope="page" />
 <%@ include file="/WEB-INF/jspf/head.jspf"%>

@@ -48,4 +48,20 @@ public class Controller extends HttpServlet {
             dispatcher.forward(request, response);
         }
     }
+    private void processPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String commandName = request.getParameter("command");
+
+        logger.trace("Parameter command ==>"+commandName);
+        Command command = CommandContainer.get(commandName);
+        logger.trace("Obtained command ==>"+commandName);
+        String redirect = Path.ERROR_PAGE;
+        try {
+            redirect = command.execute(request, response);
+        } catch (Exception ex) {
+            logger.warn("Execute exception ==>"+ex);
+            request.setAttribute("errorMessage", ex.getMessage());
+        }
+        logger.trace("Redirect ==> " + redirect);
+        response.sendRedirect(redirect);
+    }
 }
