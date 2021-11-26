@@ -1,23 +1,25 @@
 <%@include file="/WEB-INF/jspf/page.jspf"%>
 <%@include file="/WEB-INF/jspf/tags.jspf"%>
 <%@ page import="com.my.payment.db.Status" %>
+<%@ page import="com.my.payment.constants.Path" %>
 <html>
 <c:set var="title" value="Your cards" scope="page"/>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
     <table id="main-container">
+        <%@ include file="/WEB-INF/jspf/changeLocale.jspf"%>
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
                 <table class="table table-striped table-bordered" id = "mydatatable" >
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Number</th>
-                        <th>Balance</th>
-                        <th>Expiration date</th>
-                        <th >CVV</th>
-                        <th >Status</th>
+                        <th><fmt:message key='card.name'/></th>
+                        <th><fmt:message key='card.number'/></th>
+                        <th><fmt:message key='card.balance'/></th>
+                        <th><fmt:message key='card.date'/></th>
+                        <th>CVV</th>
+                        <th><fmt:message key='label.status'/></th>
                         <th></th>
                     </tr>
                     </thead>
@@ -38,7 +40,17 @@
                             <td>${item.balance}</td>
                             <td>${item.textDate}</td>
                             <td>${item.cvv}</td>
-                            <td>${item.status.toString()}</td>
+                            <td>
+                               <c:if test="${item.status==Status.BLOCKED}">
+                                   <fmt:message key='card.status.blocked'/>
+                               </c:if>
+                                <c:if test="${item.status==Status.ACTIVE}">
+                                    <fmt:message key='card.status.active'/>
+                                </c:if>
+                                <c:if test="${item.status==Status.UNBLOCK_REQUEST}">
+                                    <fmt:message key='card.status.unblockRequest'/>
+                                </c:if>
+                            </td>
                             <td>
                                 <form action="controller" method="post">
                                     <input type="hidden" name="command" value="changeCardStatus">
@@ -46,25 +58,25 @@
                                     <c:choose>
                                         <c:when test="${item.status == Status.ACTIVE}">
                                             <input type="hidden" name="newStatus" value="${Status.BLOCKED}">
-                                            <button type="submit">Block the card</button>
+                                            <button type="submit"><fmt:message key='card.status.block'/></button>
                                         </c:when>
                                         <c:when test="${item.status == Status.BLOCKED}">
                                             <c:if test="${sessionScope.userRole == Role.USER}">
                                                 <input type="hidden" name="newStatus" value="${Status.UNBLOCK_REQUEST}">
-                                                <button type="submit">Unblock card</button>
+                                                <button type="submit"><fmt:message key='card.status.unblock'/></button>
                                             </c:if>
                                             <c:if test="${sessionScope.userRole == Role.ADMIN}">
                                                 <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
-                                                <button type="submit">Unblock card</button>
+                                                <button type="submit"><fmt:message key='card.status.unblock'/></button>
                                             </c:if>
                                         </c:when>
                                         <c:when test="${item.status == Status.UNBLOCK_REQUEST}">
                                             <c:if test="${sessionScope.userRole == Role.USER}">
-                                                Unblock request is sent
+                                                <fmt:message key='card.status.reqSent'/>
                                             </c:if>
                                             <c:if test="${sessionScope.userRole == Role.ADMIN}">
                                                 <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
-                                                <button type="submit">Unblock card</button>
+                                                <button type="submit"><fmt:message key='card.status.unblock'/></button>
                                             </c:if>
                                         </c:when>
                                     </c:choose>
@@ -75,7 +87,7 @@
                     </tbody>
                 </table>
                 <c:if test="${sessionScope.userRole == Role.USER}">
-                    <a href="controller?command=getNewCardPage">Add new card</a>
+                    <a href="${Path.NEW_CARD_PAGE}"><fmt:message key='card.add'/></a>
                 </c:if>
             </td>
         </tr>

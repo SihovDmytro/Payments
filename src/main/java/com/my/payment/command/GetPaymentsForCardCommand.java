@@ -35,7 +35,7 @@ public class GetPaymentsForCardCommand implements Command{
             return forward;
         }
         LOG.trace("Parameter cardID ==>"+cardID);
-        if(user.getRole()!= Role.ADMIN && !checkCardID(cardID,(User) session.getAttribute("currUser")))
+        if(user.getRole()== Role.USER && !checkCardID(cardID,(User) session.getAttribute("currUser")))
         {
             LOG.trace("You haven't this card");
             request.setAttribute("errorMessage", "You haven't this card");
@@ -59,7 +59,7 @@ public class GetPaymentsForCardCommand implements Command{
         List<Payment> payments = dbManager.getPayments(card);
         request.setAttribute("payments",payments);
         LOG.trace("Payments ==> "+payments);
-        forward=Path.CARD_INFO;
+        forward="/"+Path.CARD_INFO;
         return forward;
     }
 

@@ -9,7 +9,6 @@
         var table = $('#mydatatable').DataTable( {
             responsive: true
         } );
-
         new $.fn.dataTable.FixedHeader( table );
     } );
 </script>

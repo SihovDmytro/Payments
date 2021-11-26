@@ -15,15 +15,13 @@ public class CommandContainer {
         commands.put("registration", new RegistrationCommand());
         commands.put("logout",new LogoutCommand());
         commands.put("getCards",new GetCardsCommand());
-        commands.put("getUserInfo",new GetUserInfoCommand());
-        commands.put("getNewCardPage",new GetNewCardPageCommand());
         commands.put("addCard",new NewCardCommand());
         commands.put("getPayments",new GetPaymentsForCardCommand());
         commands.put("makePayment",new MakePaymentCommand());
         commands.put("commitPayment",new CommitPaymentCommand());
         commands.put("changeCardStatus",new ChangeCardStatusCommand());
         commands.put("topUp",new TopUpCommand());
-
+        commands.put("changeLocale", new ChangeLocaleCommand());
         commands.put("getUsers",new GetUsersCommand());
         commands.put("changeUserStatus",new ChangeUserStatusCommand());
 

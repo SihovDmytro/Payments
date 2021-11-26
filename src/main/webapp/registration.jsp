@@ -3,10 +3,11 @@
 <%@ page import="com.my.payment.constants.Path" %>
 <!DOCTYPE html>
 <html>
-<c:set var="title" value="Sign up" scope="page" />
+<c:set var="title" scope="page" value="Sign up"/>
 <%@include file="/WEB-INF/jspf/head.jspf"%>
 <body>
 <table id ="main-container">
+	<%@ include file="/WEB-INF/jspf/changeLocale.jspf"%>
 	<tr>
 		<td class="content">
 		<form action="controller" method="post">
@@ -38,27 +39,27 @@
 				</c:if>
 			</div>
 			<div class="container">
-				<h1 >Sign up</h1>
+				<h1 ><fmt:message key="signUp.title"/></h1>
 				<hr>
-				<label for="email"><b>Email*</b></label>
-				<input type="text" placeholder="Enter email" name="email" id="email" required maxlength="45"
+				<label for="email"><b><fmt:message key="label.email"/>*</b></label>
+				<input type="text"  name="email" id="email" required maxlength="45"
 				pattern="[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$">
 
-				<label for="Login"><b>Login* (at least 3 letters of the Latin alphabet or symbols: '-', '_')</b></label>
-				<input type="text" placeholder="Enter unique login" name="login" id="login" required maxlength="20"
+				<label for="login"><b><fmt:message key="label.login"/>* <fmt:message key="label.login.spec"/></b></label>
+				<input type="text"  name="login" id="login" required maxlength="20"
 				pattern="^[\w_-]{3,20}$">
 				<script src="myScript.js"></script>
-				<label for="pass"><b>Password* </b></label>
-				<input type="password" placeholder="Enter password" name="pass" id="pass" required minlength="6" maxlength="45" onkeyup='check();'>
+				<label for="pass"><b><fmt:message key="label.password"/>* </b></label>
+				<input type="password" name="pass" id="pass" required minlength="6" maxlength="45" onkeyup='check();'>
 
-				<label for="pass-repeat"><b>Repeat Password*</b></label>
-				<input type="password" placeholder="Repeat password" name="pass-repeat" id="pass-repeat" required minlength="6" maxlength="45" onkeyup='check();'>
+				<label for="pass-repeat"><b><fmt:message key="label.password.repeat"/>*</b></label>
+				<input type="password"  name="pass-repeat" id="pass-repeat" required minlength="6" maxlength="45" onkeyup='check();'>
 				<span id='message'></span>
 				<hr>
 
-				<button type="submit" class="mybtn">Register</button>
+				<button type="submit" class="mybtn"><fmt:message key="signUp.createAccount"/></button>
 			 </div>
-			<p>Already have an account? <a class="center" href="${Path.LOGIN_PAGE}">Sign in</a>.</p>
+			<p><fmt:message key="signUp.alreadyHaveAccount"/> <a class="center" href="${Path.LOGIN_PAGE}"><fmt:message key="signUP.signIn"/></a>.</p>
 		</form>
 		<c:remove var="isSuccess" scope="session"/>
 		<c:remove var="loginExist" scope="session"/>
@@ -68,7 +69,6 @@
 		<c:remove var="emailVal" scope="session"/>
 		</td>
 	</tr>
-
 </table>
 </body>
 </html>

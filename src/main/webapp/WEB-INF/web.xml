@@ -27,7 +27,7 @@
         </init-param>
         <init-param>
             <param-name>out-of-control</param-name>
-            <param-value>login registration logout</param-value>
+            <param-value>login registration logout changeLocale</param-value>
         </init-param>
     </filter>
 </web-app>

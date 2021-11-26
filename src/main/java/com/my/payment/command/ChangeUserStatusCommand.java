@@ -11,12 +11,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 public class ChangeUserStatusCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(ChangeUserStatusCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("ChangeUserStatusCommand starts");
+        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        LOG.trace("resBundle ==> "+rb);
         String forward = Path.ERROR_PAGE;
         int userID;
         try{
@@ -24,7 +27,7 @@ public class ChangeUserStatusCommand implements Command{
             LOG.trace("Parameter userID ==>"+userID);
         }catch (NumberFormatException e){
             LOG.trace("Cannot parse userID");
-            request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
+            request.setAttribute("errorMessage", rb.getString("message.cannotChangeUserStatus"));
             return forward;
         }
         Status newStatus = null;
@@ -33,7 +36,7 @@ public class ChangeUserStatusCommand implements Command{
             LOG.trace("Status ==> "+newStatus.toString());
         }catch (NumberFormatException e){
             LOG.trace("Cannot parse newStatus");
-            request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
+            request.setAttribute("errorMessage", rb.getString("message.cannotChangeUserStatus"));
             return forward;
         }
         DBManager dbManager = DBManager.getInstance();
@@ -42,7 +45,7 @@ public class ChangeUserStatusCommand implements Command{
             LOG.trace("User status is changed");
             forward=Path.GET_USERS_COMMAND;
         }else {
-            request.setAttribute("errorMessage", Message.CANNOT_CHANGE_STATUS);
+            request.setAttribute("errorMessage", rb.getString("message.cannotChangeUserStatus"));
         }
         return forward;
     }

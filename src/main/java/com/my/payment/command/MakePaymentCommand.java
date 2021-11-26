@@ -58,19 +58,19 @@ public class MakePaymentCommand implements Command{
         boolean valid = true;
         if (!checkNumber(numberTo)) {
             LOG.trace(Message.INVALID_CARD_NUMBER);
-            request.setAttribute("invalidCardToNumber", Message.INVALID_CARD_NUMBER);
+            session.setAttribute("invalidCardToNumber", Message.INVALID_CARD_NUMBER);
             valid = false;
         }
         if (!checkAmount(amount, card)) {
             LOG.trace(Message.INVALID_AMOUNT);
             if(card.getBalance() >= amount)
-                request.setAttribute("invalidAmount", Message.INVALID_AMOUNT);
-            else request.setAttribute("invalidAmount", Message.HAVE_NO_MONEY);
+                session.setAttribute("invalidAmount", Message.INVALID_AMOUNT);
+            else session.setAttribute("invalidAmount", Message.HAVE_NO_MONEY);
             valid = false;
         }
         if (card.getNumber().equals(numberTo)) {
             LOG.trace("Enter another card");
-            request.setAttribute("anotherCard", "Enter another card");
+            session.setAttribute("anotherCard", "Enter another card");
             valid = false;
         }
         if (valid) {
@@ -105,7 +105,7 @@ public class MakePaymentCommand implements Command{
             }
         } else {
             LOG.trace("Invalid parameters");
-            forward = "/"+Path.MAKE_PAYMENT_PAGE;
+            forward = Path.MAKE_PAYMENT_PAGE;
         }
         return forward;
     }

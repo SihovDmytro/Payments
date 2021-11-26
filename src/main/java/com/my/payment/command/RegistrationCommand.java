@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,8 @@ public class RegistrationCommand implements Command{
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         logger.debug("RegistrationCommand starts");
+        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        logger.trace("resBundle ==> "+rb);
         boolean continueReg = true;
         String email=request.getParameter("email");
         logger.trace("Request parameter email ==> "+email);
@@ -35,29 +38,29 @@ public class RegistrationCommand implements Command{
         HttpSession session = request.getSession();
         if(!checkEmail(email)) {
             logger.warn(Message.INVALID_EMAIL);
-            session.setAttribute("emailVal", Message.INVALID_EMAIL);
+            session.setAttribute("emailVal", rb.getString("message.invalidEmail"));
             continueReg=false;
         }
         if(!checkLogin(login)) {
             logger.warn(Message.INVALID_LOGIN);
-            session.setAttribute("loginVal",Message.INVALID_LOGIN);
+            session.setAttribute("loginVal",rb.getString("message.invalidLogin"));
             continueReg=false;
         }
         if(!checkPass(pass)) {
             logger.warn(Message.INVALID_PASS);
-            session.setAttribute("passVal",Message.INVALID_PASS);
+            session.setAttribute("passVal",rb.getString("message.invalidPass"));
             continueReg=false;
         }
         if(!checkPass(passR) || !pass.equals(passR)  ) {
             logger.warn(Message.DIFFERENT_PASS);
-            session.setAttribute("repeatPVal",Message.DIFFERENT_PASS);
+            session.setAttribute("repeatPVal",rb.getString("message.difPass"));
             continueReg=false;
         }
         DBManager dbManager = DBManager.getInstance();
         if(dbManager.findUser(login)!=null)
         {
             logger.warn(Message.LOGIN_EXISTS);
-            session.setAttribute("loginExist",Message.LOGIN_EXISTS);
+            session.setAttribute("loginExist",rb.getString("message.loginEx"));
             continueReg=false;
         }
         if(continueReg) {
@@ -65,13 +68,13 @@ public class RegistrationCommand implements Command{
             logger.warn("Formed user ==> "+user);
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);
-                session.setAttribute("isSuccess",Message.USER_CREATED);
+                session.setAttribute("isSuccess",rb.getString("message.userCreate"));
             } else {
-                session.setAttribute("isSuccess", Message.CANNOT_CREATE_USER);
+                session.setAttribute("isSuccess", rb.getString("message.cannotCreateUser"));
             }
         }
         else logger.warn(Message.CANNOT_CREATE_USER);
-        forward="/"+Path.REGISTRATION_PAGE;
+        forward=Path.REGISTRATION_PAGE;
         return forward;
     }
     private boolean checkEmail(String text)

@@ -3,6 +3,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @WebListener
 public class ContextListener implements ServletContextListener {
@@ -12,5 +14,10 @@ public class ContextListener implements ServletContextListener {
         String path = servletContext.getRealPath("/WEB-INF/Payments.log");
         System.setProperty("logFile", path);
         System.out.println("logFile ==> "+path);
+        servletContext.setAttribute("language","en_US");
+        Locale locale=new Locale("en","US");
+        ResourceBundle rb = ResourceBundle.getBundle("localization",locale);
+        System.out.println("resBundle ==> "+rb);
+        servletContext.setAttribute("resBundle",rb);
     }
 }

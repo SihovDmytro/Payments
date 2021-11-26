@@ -27,7 +27,7 @@ public class TopUpCommand implements Command{
         Card card = (Card) session.getAttribute("currCard");
         LOG.trace("card parameter ==> "+card);
         DBManager dbManager = DBManager.getInstance();
-        if(card.getStatus()== Status.BLOCKED)
+        if(card == null || card.getStatus()== Status.BLOCKED )
         {
             LOG.trace(Message.CARD_IS_BLOCKED);
             request.setAttribute("errorMessage", Message.CARD_IS_BLOCKED);
@@ -43,11 +43,11 @@ public class TopUpCommand implements Command{
             return forward;
         }
         LOG.trace("Amount ==> "+amount);
-        forward="/controller?command=getPayments&cardItem="+card.getCardID();
         if(!checkAmount(amount,card))
         {
+            forward=Path.GET_CARD_INFO_COMMAND+"&cardItem="+card.getCardID();
             LOG.trace("Amount out of bounds");
-            request.setAttribute("amountLimit","Maximum amount = "+ BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
+            session.setAttribute("amountLimit","Maximum amount = "+ BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
         }
         else {
             if(!dbManager.topUpCard(card,amount))

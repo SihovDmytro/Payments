@@ -36,6 +36,6 @@ public class GetCardsCommand implements Command{
 
         request.setAttribute("listCards",cards);
         LOG.trace("Obtained cards ==> "+cards);
-        return Path.CARDS_PAGE;
+        return "/"+Path.CARDS_PAGE;
     }
 }

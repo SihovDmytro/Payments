@@ -335,7 +335,7 @@ public class DBManager {
         try {
             con = dbManager.getConnection();
             ps = con.prepareStatement(GET_CARDS_FOR_USER);
-            ps.setString(1, user.getLogin());
+            ps.setInt(1, user.getUserID());
             rs = ps.executeQuery();
             while (rs.next()) {
                 String number = rs.getString(3);

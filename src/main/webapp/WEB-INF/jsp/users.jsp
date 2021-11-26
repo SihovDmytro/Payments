@@ -6,16 +6,17 @@
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <body>
     <table id="main-container">
+        <%@ include file="/WEB-INF/jspf/changeLocale.jspf"%>
         <%@include file="/WEB-INF/jspf/header.jspf"%>
         <tr>
             <td class="content">
                 <table id = "mydatatable" class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th>Login</th>
-                        <th>Role</th>
-                        <th>Email</th>
-                        <th>Status</th>
+                        <th><fmt:message key='label.login'/></th>
+                        <th><fmt:message key='label.role'/></th>
+                        <th><fmt:message key='label.email'/></th>
+                        <th><fmt:message key='label.status'/></th>
                         <th></th>
                     </tr>
                     </thead>
@@ -23,9 +24,23 @@
                     <c:forEach var="item" items="${requestScope.users}">
                         <tr>
                             <td>${item.login}</td>
-                            <td>${item.role.toString()}</td>
+                            <td>
+                                <c:if test="${item.role==Role.USER}">
+                                    <fmt:message key='role.user'/>
+                                </c:if>
+                                <c:if test="${item.role==Role.ADMIN}">
+                                    <fmt:message key='role.admin'/>
+                                </c:if>
+                            </td>
                             <td>${item.email}</td>
-                            <td>${item.status.toString()}</td>
+                            <td>
+                                <c:if test="${item.status==Status.BLOCKED}">
+                                    <fmt:message key='user.status.blocked'/>
+                                </c:if>
+                                <c:if test="${item.status==Status.ACTIVE}">
+                                    <fmt:message key='user.status.active'/>
+                                </c:if>
+                            </td>
                             <td>
                                 <c:if test="${item.role == Role.USER}">
                                         <form action="controller" method="post">
@@ -34,15 +49,14 @@
                                             <c:choose>
                                                 <c:when test="${item.status == Status.ACTIVE}">
                                                     <input type="hidden" name="newStatus" value="${Status.BLOCKED}">
-                                                    <button type="submit">Block user</button>
+                                                    <button type="submit"><fmt:message key='user.block'/></button>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
-                                                    <button type="submit">Unblock user</button>
+                                                    <button type="submit"><fmt:message key='user.unblock'/></button>
                                                 </c:otherwise>
                                             </c:choose>
                                         </form>
-
                                 </c:if>
                             </td>
                         </tr>

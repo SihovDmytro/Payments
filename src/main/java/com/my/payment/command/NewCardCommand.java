@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.DateFormat;
@@ -24,6 +25,7 @@ public class NewCardCommand implements Command{
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("NewCardCommand starts");
+        HttpSession session = request.getSession();
         String name = request.getParameter("name");
         LOG.trace("Parameter name ==> "+name);
         String cardNumber = request.getParameter("cardNumber");
@@ -36,25 +38,25 @@ public class NewCardCommand implements Command{
         if(!checkName(name))
         {
             LOG.trace(Message.INVALID_CARD_NAME);
-            request.setAttribute("invalidName",Message.INVALID_CARD_NAME);
+            session.setAttribute("invalidName",Message.INVALID_CARD_NAME);
             valid=false;
         }
         if(!checkExpDate(expDate))
         {
             LOG.trace(Message.INVALID_EXPIRATION_DATE);
-            request.setAttribute("invalidExpDate",Message.INVALID_EXPIRATION_DATE);
+            session.setAttribute("invalidExpDate",Message.INVALID_EXPIRATION_DATE);
             valid=false;
         }
         if(!checkNumber(cardNumber))
         {
             LOG.trace(Message.INVALID_CARD_NUMBER);
-            request.setAttribute("invalidNumber",Message.INVALID_CARD_NUMBER);
+            session.setAttribute("invalidNumber",Message.INVALID_CARD_NUMBER);
             valid=false;
         }
         if(!checkCVV(cvv))
         {
             LOG.trace(Message.INVALID_CVV);
-            request.setAttribute("invalidCVV",Message.INVALID_CVV);
+            session.setAttribute("invalidCVV",Message.INVALID_CVV);
             valid=false;
         }
         if(valid)
@@ -70,22 +72,23 @@ public class NewCardCommand implements Command{
             }
             DBManager dbManager = DBManager.getInstance();
             Card card = new Card(name,cardNumber,calendar,Integer.parseInt(cvv),0, cardStatus);
-            User user = (User) request.getSession().getAttribute("currUser");
+            LOG.trace("Formed card ==> "+ card);
+            User user = (User) session.getAttribute("currUser");
             if(dbManager.findCard(card,user))
             {
                 LOG.trace(Message.CARD_ALREADY_ADDED);
-                request.setAttribute("alreadyAdded",Message.CARD_ALREADY_ADDED);
+                session.setAttribute("alreadyAdded",Message.CARD_ALREADY_ADDED);
                 return Path.NEW_CARD_PAGE;
             }
             else{
                 if(dbManager.addNewCard(card,user))
                 {
                     LOG.trace(Message.CARD_ADD_SUCCESS);
-                    request.setAttribute("isSuccess",Message.CARD_ADD_SUCCESS);
+                    session.setAttribute("isSuccess",Message.CARD_ADD_SUCCESS);
                 }
                 else{
                     LOG.trace(Message.CANNOT_ADD_CARD);
-                    request.setAttribute("isSuccess",Message.CANNOT_ADD_CARD);
+                    session.setAttribute("isSuccess",Message.CANNOT_ADD_CARD);
                 }
             }
         }
@@ -94,8 +97,6 @@ public class NewCardCommand implements Command{
         }
         return Path.NEW_CARD_PAGE;
     }
-
-
 
     private boolean checkExpDate(String txt)
     {
