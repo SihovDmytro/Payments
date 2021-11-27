@@ -22,10 +22,11 @@ public class DBManager {
     private static final String FIND_USER = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status FROM user u join roles r on u.roles_id=r.id WHERE login=?";
     private static final String ADD_USER = "INSERT INTO user (login, roles_id, pass, email, status) VALUES (?,?,?,?,?)";
     private static final String TRY_TO_LOGIN = "SELECT * FROM user WHERE BINARY login=? AND BINARY pass=?";
-    private static final String GET_CARDS_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE u.id=?";
+    private static final String GET_CARDS_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status,c.pin FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE u.id=?";
+    private static final String GET_CARD_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status,c.pin FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE u.id=? AND c.id=?";
     private static final String GET_ALL_CARDS="SELECT * FROM card";
     private static final String GET_CARD = "SELECT * FROM card WHERE number=? AND end_date=? AND cvv=?";
-    private static final String CREATE_NEW_CARD = "INSERT INTO card(name, number,end_date,cvv,balance,status) VALUES(?,?,?,?,?,?)";
+    private static final String CREATE_NEW_CARD = "INSERT INTO card(name, number,end_date,cvv,balance,status,pin) VALUES(?,?,date_add(curdate(), interval 5 YEAR),?,0,'active',?); ";
     private static final String ADD_CARD = "INSERT INTO user_has_card(user_id,card_id) VALUES(?,?)";
     private static final String GET_PAYMENTS_IN = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c1.id=? AND p.status='sent' ORDER BY p.date DESC;";
     private static final String GET_PAYMENTS_OUT = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c2.id=? ORDER BY p.date DESC";
@@ -188,7 +189,7 @@ public class DBManager {
             while (rs.next()) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(rs.getDate(4));
-                Card card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                Card card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
                 cards.add(card);
             }
         } catch (SQLException exception) {
@@ -212,7 +213,7 @@ public class DBManager {
             while (rs.next()) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(rs.getDate(4));
-                Card card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                Card card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
                 cards.add(card);
             }
         } catch (SQLException exception) {
@@ -223,33 +224,45 @@ public class DBManager {
         }
         return cards;
     }
-
-    public boolean addNewCard(Card card, User user) {
+    public boolean addCard(Card card, User user) {
         PreparedStatement ps = null;
-        Connection con = null;
-        card.setCardID(isCardExist(card));
+        Connection con=null;
+        boolean result=false;
         try {
-            if (card.getCardID() == -1) {
-                LOG.trace("Create new card");
-                card.setCardID(createCard(card));
-            }
-            con = dbManager.getConnection();
+            con= dbManager.getConnection();
             ps = con.prepareStatement(ADD_CARD);
             ps.setInt(1, user.getUserID());
             ps.setInt(2, card.getCardID());
             int count = ps.executeUpdate();
-            if (count != 1) {
-                throw new SQLException();
+            if (count == 1) {
+                result=true;
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_ADD_CARD);
-
-            return false;
         } finally {
             close(con);
             close(ps);
         }
-        return true;
+        return result;
+    }
+    private boolean addNewCard(Card card, User user,Connection con) {
+        PreparedStatement ps = null;
+        boolean result=false;
+        try {
+            ps = con.prepareStatement(ADD_CARD);
+            ps.setInt(1, user.getUserID());
+            ps.setInt(2, card.getCardID());
+            int count = ps.executeUpdate();
+            if (count == 1) {
+                result=true;
+            }
+        } catch (SQLException exception) {
+            LOG.warn(Message.CANNOT_ADD_CARD);
+            return result;
+        } finally {
+            close(ps);
+        }
+        return result;
     }
 
     public Card getCardByID(int id) {
@@ -265,7 +278,7 @@ public class DBManager {
             if (rs.next()) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(rs.getDate(4));
-                card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                card = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);
@@ -276,85 +289,69 @@ public class DBManager {
         return card;
     }
 
-    private int createCard(Card card) {
+    public boolean createNewCard(Card card,User user) {
         PreparedStatement ps = null;
         Connection con = null;
-        ResultSet rs = null;
-        int id = -1;
+        ResultSet rs=null;
+        boolean result=false;
         try {
             con = dbManager.getConnection();
-            ps = con.prepareStatement(CREATE_NEW_CARD, Statement.RETURN_GENERATED_KEYS);
+            con.setAutoCommit(false);
+            ps = con.prepareStatement(CREATE_NEW_CARD,Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, card.getName());
             ps.setString(2, card.getNumber());
-            ps.setDate(3, new Date(card.getDate().getTimeInMillis()));
-            ps.setInt(4, card.getCvv());
-            ps.setDouble(5, card.getBalance());
-            ps.setString(6, card.getStatus().toString().toLowerCase());
+            ps.setInt(3, card.getCvv());
+            ps.setInt(4,card.getPin());
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                id = rs.getInt(1);
+            if(rs.next()) {
+                LOG.trace("generatedKey ==> "+rs.getInt(1));
+                card.setCardID(rs.getInt(1));
+                if(addNewCard(card,user,con))
+                {
+                    LOG.trace("Add card");
+                    con.commit();
+                    result=true;
+                }
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);
-
-        } finally {
-            close(con, ps, rs);
-        }
-        return id;
-    }
-
-    private int isCardExist(Card card) {
-        PreparedStatement ps = null;
-        Connection con = null;
-        ResultSet rs = null;
-        int id = -1;
-        try {
-            con = dbManager.getConnection();
-            ps = con.prepareStatement(GET_CARD);
-            ps.setString(1, card.getNumber());
-            ps.setDate(2, new Date(card.getDate().getTimeInMillis()));
-            ps.setInt(3, card.getCvv());
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                id = rs.getInt(1);
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException exception1) {
+                    LOG.warn("Cannot rollback " + exception);
+                }
             }
-        } catch (SQLException exception) {
-            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
         } finally {
-            close(con, ps, rs);
+            close(con,ps,rs);
         }
-
-        return id;
+        return result;
     }
 
     public boolean findCard(Card card, User user) {
         PreparedStatement ps = null;
         Connection con = null;
         ResultSet rs = null;
+        boolean result=false;
         try {
             con = dbManager.getConnection();
-            ps = con.prepareStatement(GET_CARDS_FOR_USER);
+            ps = con.prepareStatement(GET_CARD_FOR_USER);
             ps.setInt(1, user.getUserID());
+            ps.setInt(2, card.getCardID());
             rs = ps.executeQuery();
-            while (rs.next()) {
-                String number = rs.getString(3);
-                Calendar c = Calendar.getInstance();
-                c.setTime(rs.getDate(4));
-                int cvv = rs.getInt(5);
-                if (number.equals(card.getNumber()) && cvv == card.getCvv() && c.equals(card.getDate())) {
-                    LOG.trace("Card found");
-                    return true;
-                }
+            if(rs.next())
+            {
+                result=true;
             }
+
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);
 
         } finally {
             close(con, ps, rs);
         }
-        LOG.trace("Card doesn't found");
-        return false;
+        return result;
     }
 
     public List<Payment> getPayments(Card card) {
@@ -370,16 +367,16 @@ public class DBManager {
             while (rs.next()) {
                 Calendar c1 = Calendar.getInstance();
                 c1.setTime(rs.getDate(4));
-                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()), rs.getInt(8));
                 Calendar c2 = Calendar.getInstance();
-                c2.setTime(rs.getDate(11));
-                Card cardto = new Card(rs.getInt(8), rs.getString(9), rs.getString(10), c2, rs.getInt(12), rs.getDouble(13), Status.valueOf(rs.getString(14).toUpperCase()));
+                c2.setTime(rs.getDate(12));
+                Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()), rs.getInt(16));
                 Calendar paymentDate = Calendar.getInstance();
-                String textDate = rs.getString(15);
+                String textDate = rs.getString(17);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 java.util.Date date = sdf.parse(textDate);
                 paymentDate.setTime(date);
-                payments.add(new Payment(rs.getInt(18), cardFrom, cardto, paymentDate, rs.getDouble(16), PaymentStatus.valueOf(rs.getString(17).toUpperCase())));
+                payments.add(new Payment(rs.getInt(20), cardFrom, cardto, paymentDate, rs.getDouble(18), PaymentStatus.valueOf(rs.getString(19).toUpperCase())));
             }
             ps = con.prepareStatement(GET_PAYMENTS_OUT);
             ps.setInt(1, card.getCardID());
@@ -387,16 +384,16 @@ public class DBManager {
             while (rs.next()) {
                 Calendar c1 = Calendar.getInstance();
                 c1.setTime(rs.getDate(4));
-                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
                 Calendar c2 = Calendar.getInstance();
-                c2.setTime(rs.getDate(11));
-                Card cardto = new Card(rs.getInt(8), rs.getString(9), rs.getString(10), c2, rs.getInt(12), rs.getDouble(13), Status.valueOf(rs.getString(14).toUpperCase()));
+                c2.setTime(rs.getDate(12));
+                Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()),rs.getInt(16));
                 Calendar paymentDate = Calendar.getInstance();
-                String textDate = rs.getString(15);
+                String textDate = rs.getString(17);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 java.util.Date date = sdf.parse(textDate);
                 paymentDate.setTime(date);
-                payments.add(new Payment(rs.getInt(18),cardFrom, cardto, paymentDate, rs.getDouble(16), PaymentStatus.valueOf(rs.getString(17).toUpperCase())));
+                payments.add(new Payment(rs.getInt(20),cardFrom, cardto, paymentDate, rs.getDouble(18), PaymentStatus.valueOf(rs.getString(19).toUpperCase())));
             }
 
         } catch (SQLException | ParseException exception) {
@@ -421,16 +418,16 @@ public class DBManager {
             if (rs.next()) {
                 Calendar c1 = Calendar.getInstance();
                 c1.setTime(rs.getDate(4));
-                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
                 Calendar c2 = Calendar.getInstance();
-                c2.setTime(rs.getDate(11));
-                Card cardto = new Card(rs.getInt(8), rs.getString(9), rs.getString(10), c2, rs.getInt(12), rs.getDouble(13), Status.valueOf(rs.getString(14).toUpperCase()));
+                c2.setTime(rs.getDate(12));
+                Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()),rs.getInt(16));
                 Calendar paymentDate = Calendar.getInstance();
-                String textDate = rs.getString(15);
+                String textDate = rs.getString(17);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 java.util.Date date = sdf.parse(textDate);
                 paymentDate.setTime(date);
-                payment = new Payment(rs.getInt(18), cardFrom, cardto, paymentDate, rs.getDouble(16), PaymentStatus.valueOf(rs.getString(17).toUpperCase()));
+                payment = new Payment(rs.getInt(20), cardFrom, cardto, paymentDate, rs.getDouble(18), PaymentStatus.valueOf(rs.getString(19).toUpperCase()));
             }
         } catch (SQLException | ParseException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);
@@ -454,7 +451,7 @@ public class DBManager {
             if (rs.next()) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(rs.getDate(4));
-                cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()));
+                cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()),rs.getInt(8));
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);

@@ -4,7 +4,6 @@ import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.PaymentStatus;
-import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.Payment;
 import com.mysql.cj.protocol.PacketReceivedTimeHolder;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 public class CommitPaymentCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(CommitPaymentCommand.class);
@@ -23,6 +23,8 @@ public class CommitPaymentCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.trace("CommitPaymentCommand starts");
+        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        LOG.trace("resBundle ==> "+rb);
         String forward = Path.ERROR_PAGE;
         int paymentID;
         try {
@@ -30,7 +32,7 @@ public class CommitPaymentCommand implements Command {
             paymentID = Integer.parseInt(request.getParameter("paymentID"));
         } catch (NumberFormatException exception) {
             LOG.warn("Cannot parse paymentID");
-            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+            request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
             return forward;
         }
 
@@ -40,25 +42,25 @@ public class CommitPaymentCommand implements Command {
         if(payment==null)
         {
             LOG.warn("Cannot get payment from DB");
-            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+            request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
             return forward;
         }
         if(payment.getFrom().getBalance()<payment.getAmount())
         {
             LOG.warn(Message.HAVE_NO_MONEY);
-            request.setAttribute("errorMessage", Message.HAVE_NO_MONEY);
+            request.setAttribute("errorMessage", rb.getString("message.haveNoMoney"));
             return forward;
         }
         HttpSession session = request.getSession();
         if(dbManager.commitPayment(payment))
         {
             LOG.trace("Transaction complete ");
-            session.setAttribute("resultTitle", "Success");
-            session.setAttribute("resultMessage", Message.TRANSACTION_SUCCESS);
+            session.setAttribute("resultTitle", rb.getString("message.success"));
+            session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
             forward = Path.RESULT_PAGE;
         } else {
             LOG.warn("Payment error");
-            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+            request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
         }
         return forward;
     }

@@ -1,5 +1,6 @@
 <%@ include file="/WEB-INF/jspf/tags.jspf"%>
 <%@ include file="/WEB-INF/jspf/page.jspf"%>
+<%@ page import="com.my.payment.constants.Path" %>
 <!DOCTYPE html>
 <html>
 <c:set var="title" value="${sessionScope.resultTitle}" scope="page" />
@@ -14,9 +15,9 @@
             <br>
             <a href="loginPage.jsp"><fmt:message key='page.login'/></a>
             <c:if test="${not empty sessionScope.currUser}">
-                <a href="controller?command=getUserInfo"><fmt:message key='page.Cabinet'/></a>
+                <a href="${Path.USER_CABINET}"><fmt:message key='page.Cabinet'/></a>
                 <c:if test="${not empty sessionScope.currCard}">
-                    <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}"><fmt:message key='page.card'/></a>
+                    <a href="${Path.GET_CARD_INFO_COMMAND}&cardItem=${sessionScope.currCard.cardID}"><fmt:message key='page.card'/></a>
                 </c:if>
             </c:if>
             <c:remove var="resultMessage" scope="session"/>

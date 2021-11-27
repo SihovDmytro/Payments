@@ -15,33 +15,32 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewCardCommand implements Command{
-    private static final Logger LOG = LogManager.getLogger(NewCardCommand.class);
+public class CreateCardCommand implements Command{
+    private static final Logger LOG = LogManager.getLogger(CreateCardCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        LOG.debug("NewCardCommand starts");
+        LOG.debug("CreateCardCommand starts");
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         LOG.trace("resBundle ==> "+rb);
         HttpSession session = request.getSession();
+        String name = request.getParameter("name");
+        LOG.trace("Parameter name ==> "+name);
         String cardNumber = request.getParameter("cardNumber");
         LOG.trace("Parameter cardNumber ==> "+cardNumber);
         String cvv = request.getParameter("cvv");
         LOG.trace("Parameter cvv ==> "+cvv);
         String pin = request.getParameter("pin");
         LOG.trace("Parameter pin ==> "+pin);
-        String expDate = request.getParameter("exp-date");
-        LOG.trace("Parameter exp-date ==> "+expDate);
         boolean valid = true;
-        if(!checkExpDate(expDate))
+        if(!checkName(name))
         {
-            LOG.trace(Message.INVALID_EXPIRATION_DATE);
-            session.setAttribute("invalidExpDate",rb.getString("message.invalidExpDate"));
+            LOG.trace(Message.INVALID_CARD_NAME);
+            session.setAttribute("invalidName",rb.getString("message.invalidCardName"));
             valid=false;
         }
         if(!checkNumber(cardNumber))
@@ -62,54 +61,33 @@ public class NewCardCommand implements Command{
             session.setAttribute("invalidPIN",rb.getString("message.invalidPIN"));
             valid=false;
         }
-        if(valid) {
+        if(valid)
+        {
             LOG.trace("Valid parameters");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(Date.valueOf(expDate));
             DBManager dbManager = DBManager.getInstance();
-            Card card = dbManager.getCardByNumber(cardNumber);
-            if (card == null) {
-                LOG.trace("Card number doesn't exists");
-                session.setAttribute("doesNotEx", rb.getString("message.invNumber"));
-                return Path.NEW_CARD_PAGE;
-            }
+            Card card = new Card(name,cardNumber,Calendar.getInstance(),Integer.parseInt(cvv),0, Status.ACTIVE,Integer.parseInt(pin));
+            LOG.trace("Formed card ==> "+ card);
             User user = (User) session.getAttribute("currUser");
-            if (dbManager.findCard(card, user)) {
-                LOG.trace(Message.CARD_ALREADY_ADDED);
-                session.setAttribute("alreadyAdded", rb.getString("message.cardAdded"));
-                return Path.NEW_CARD_PAGE;
+            if(dbManager.getCardByNumber(card.getNumber())!=null)
+            {
+                LOG.trace("This number already exists");
+                session.setAttribute("alreadyExist",rb.getString("message.numberExists"));
+                return Path.CREATE_CARD_PAGE;
             }
-            if (card.getDate().equals(calendar) && card.getPin() == Integer.parseInt(pin) && card.getCvv() == Integer.parseInt(cvv)) {
-                if (dbManager.addCard(card, user)) {
-                    LOG.trace(Message.CARD_ADD_SUCCESS);
-                    session.setAttribute("isSuccess", rb.getString("message.cardAdded"));
-                } else {
-                    LOG.trace(Message.CANNOT_ADD_CARD);
-                    session.setAttribute("isSuccess", rb.getString("message.cannotAddCard"));
-                }
-            } else {
-                LOG.trace("Wrong endDate/cvv/pin");
-                session.setAttribute("wrongData", rb.getString("message.wrongData"));
+            if(dbManager.createNewCard(card,user))
+            {
+                LOG.trace(Message.CARD_ADD_SUCCESS);
+                session.setAttribute("isSuccess",rb.getString("message.cardAdded"));
             }
-        }else {
+            else{
+                LOG.trace(Message.CANNOT_ADD_CARD);
+                session.setAttribute("isSuccess",rb.getString("message.cannotAddCard"));
+            }
+        }
+        else {
             LOG.trace("invalid parameters");
         }
-        return Path.NEW_CARD_PAGE;
-    }
-
-    private boolean checkExpDate(String txt)
-    {
-        if(txt==null) return false;
-        try{
-            Calendar calendar =  Calendar.getInstance();
-            calendar.setTime(Date.valueOf(txt));
-            int year= calendar.get(Calendar.YEAR);
-            int currYear= Calendar.getInstance().get(Calendar.YEAR);
-            return Math.abs(year-currYear)<=5;
-        }
-        catch (IllegalArgumentException exception){
-            return false;
-        }
+        return Path.CREATE_CARD_PAGE;
     }
     private boolean checkCVV(String txt)
     {
@@ -118,6 +96,13 @@ public class NewCardCommand implements Command{
         Matcher m = p.matcher(txt);
         return m.find() && txt.length()==3;
     }
+    private boolean checkPIN(String txt)
+    {
+        if(txt==null) return false;
+        Pattern p = Pattern.compile("^\\d{4}$");
+        Matcher m = p.matcher(txt);
+        return m.find() && txt.length()==4;
+    }
     private boolean checkNumber(String txt)
     {
         if(txt==null) return false;
@@ -125,11 +110,9 @@ public class NewCardCommand implements Command{
         Matcher m = p.matcher(txt);
         return m.find() && txt.length()==16;
     }
-    private boolean checkPIN(String txt)
+    private boolean checkName(String txt)
     {
-        if(txt==null) return false;
-        Pattern p = Pattern.compile("^\\d{4}$");
-        Matcher m = p.matcher(txt);
-        return m.find() && txt.length()==4;
+        if(txt==null) return true;
+        return txt.length() <= 45;
     }
 }

@@ -16,12 +16,15 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class TopUpCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(TopUpCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("TopUpCommand start");
+        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        LOG.trace("resBundle ==> "+rb);
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
         Card card = (Card) session.getAttribute("currCard");
@@ -30,7 +33,7 @@ public class TopUpCommand implements Command{
         if(card == null || card.getStatus()== Status.BLOCKED )
         {
             LOG.trace(Message.CARD_IS_BLOCKED);
-            request.setAttribute("errorMessage", Message.CARD_IS_BLOCKED);
+            request.setAttribute("errorMessage", rb.getString("message.cardBlocked"));
             return forward;
         }
         double amount;
@@ -39,7 +42,7 @@ public class TopUpCommand implements Command{
         }catch (NumberFormatException exception)
         {
             LOG.warn("Cannot parse amount");
-            request.setAttribute("errorMessage","Cannot parse amount");
+            request.setAttribute("errorMessage",rb.getString("message.invAmount"));
             return forward;
         }
         LOG.trace("Amount ==> "+amount);
@@ -47,19 +50,19 @@ public class TopUpCommand implements Command{
         {
             forward=Path.GET_CARD_INFO_COMMAND+"&cardItem="+card.getCardID();
             LOG.trace("Amount out of bounds");
-            session.setAttribute("amountLimit","Maximum amount = "+ BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
+            session.setAttribute("amountLimit",rb.getString("message.maxAmount")+" = "+ BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
         }
         else {
             if(!dbManager.topUpCard(card,amount))
             {
                 LOG.warn(Message.CANNOT_TOP_UP);
-                request.setAttribute("errorMessage", Message.CANNOT_TOP_UP);
+                request.setAttribute("errorMessage", rb.getString("message.cannotTopUp"));
                 return Path.ERROR_PAGE;
             }
             else {
                 LOG.warn(Message.TOP_UP_SUCCESS);
-                session.setAttribute("resultTitle","Success");
-                session.setAttribute("resultMessage",Message.TOP_UP_SUCCESS);
+                session.setAttribute("resultTitle",rb.getString("message.success"));
+                session.setAttribute("resultMessage", rb.getString("message.topUpSuccess"));
                 forward=Path.RESULT_PAGE;
             }
         }

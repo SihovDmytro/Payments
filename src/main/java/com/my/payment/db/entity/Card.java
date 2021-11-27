@@ -15,19 +15,21 @@ public class Card {
     private int cvv;
     private double balance;
     private Status status;
+    private int pin;
 
     public Card() {
     }
 
-    public Card(String name, String number, Calendar date, int cvv, double balance, Status status) {
+    public Card(String name, String number, Calendar date, int cvv, double balance, Status status,int pin) {
         this.name = name;
         this.number = number;
         this.date = date;
         this.cvv = cvv;
         this.balance = balance;
         this.status = status;
+        this.pin=pin;
     }
-    public Card(int id, String name, String number, Calendar date, int cvv, double balance, Status status) {
+    public Card(int id, String name, String number, Calendar date, int cvv, double balance, Status status, int pin) {
         cardID=id;
         this.name = name;
         this.number = number;
@@ -35,18 +37,27 @@ public class Card {
         this.cvv = cvv;
         this.balance = balance;
         this.status = status;
+        this.pin=pin;
     }
+
+    public int getPin() {
+        return pin;
+    }
+
     @Override
     public String toString() {
         return "Card{" +
-                "name='" + name + '\'' +
+                "cardID=" + cardID +
+                ", name='" + name + '\'' +
                 ", number='" + number + '\'' +
                 ", date=" + getTextDate() +
                 ", cvv=" + cvv +
                 ", balance=" + balance +
                 ", status=" + status +
+                ", pin=" + pin +
                 '}';
     }
+
     public String getTextBalance()
     {
         return new BigDecimal(balance).toPlainString();
@@ -115,11 +126,11 @@ public class Card {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
-        return cardID == card.cardID && cvv == card.cvv && Double.compare(card.balance, balance) == 0 && number.equals(card.number) && date.equals(card.date) && status == card.status;
+        return cardID == card.cardID && cvv == card.cvv && Double.compare(card.balance, balance) == 0 && pin == card.pin && number.equals(card.number) && date.equals(card.date) && status == card.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cardID, number, date, cvv, balance, status);
+        return Objects.hash(cardID, number, date, cvv, balance, status, pin);
     }
 }

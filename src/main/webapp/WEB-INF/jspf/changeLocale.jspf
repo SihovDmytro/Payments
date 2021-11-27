@@ -7,6 +7,5 @@
                 <option value="en_US" ${applicationScope.language eq "en_US" ? 'selected': ''}><fmt:message key='lang.en'/></option>
             </select>
         </form>
-        <hr>
     </td>
 </tr>

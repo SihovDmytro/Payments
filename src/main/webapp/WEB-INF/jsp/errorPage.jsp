@@ -12,9 +12,9 @@
             ${requestScope.errorMessage}<br>
             <a href="${Path.LOGIN_PAGE}"><fmt:message key='page.login'/></a>
             <c:if test="${not empty sessionScope.currUser}">
-                <a href="controller?command=getUserInfo"><fmt:message key='page.Cabinet'/></a>
+                <a href="${Path.USER_CABINET}"><fmt:message key='page.Cabinet'/></a>
                 <c:if test="${not empty sessionScope.currCard}">
-                    <a href="controller?command=getPayments&cardItem=${sessionScope.currCard.cardID}"><fmt:message key='page.card'/></a>
+                    <a href="${Path.GET_CARD_INFO_COMMAND}&cardItem=${sessionScope.currCard.cardID}"><fmt:message key='page.card'/></a>
                 </c:if>
             </c:if>
         </td>

@@ -87,7 +87,8 @@
                     </tbody>
                 </table>
                 <c:if test="${sessionScope.userRole == Role.USER}">
-                    <a href="${Path.NEW_CARD_PAGE}"><fmt:message key='card.add'/></a>
+                    <a href="${Path.NEW_CARD_PAGE}"><fmt:message key='card.add'/></a><br>
+                    <a href="${Path.CREATE_CARD_PAGE}"><fmt:message key='card.create'/></a>
                 </c:if>
             </td>
         </tr>

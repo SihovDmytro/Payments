@@ -9,6 +9,7 @@ public class Path {
     public static final String REGISTRATION_PAGE="registration.jsp";
     public static final String CARDS_PAGE="cards.jsp";
     public static final String NEW_CARD_PAGE="newCard.jsp";
+    public static final String CREATE_CARD_PAGE="createCard.jsp";
     public static final String CARD_INFO="cardInfo.jsp";
     public static final String MAKE_PAYMENT_PAGE="makePayment.jsp";
     public static final String MAKE_PAYMENT_COMMAND="controller?command=makePayment";

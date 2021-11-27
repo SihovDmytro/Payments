@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,9 @@ public class MakePaymentCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(MakePaymentCommand.class);
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        LOG.trace("MakePaymentCommand starts");
+        LOG.debug("MakePaymentCommand starts");
+        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        LOG.trace("resBundle ==> "+rb);
         String numberTo = request.getParameter("cardNumberTo");
         LOG.trace("numberTo parameter ==> " + numberTo);
         String forward = Path.ERROR_PAGE;
@@ -34,7 +37,7 @@ public class MakePaymentCommand implements Command{
         LOG.trace("from card ==> "+card);
         if(card==null) {
             LOG.trace(Message.INVALID_CARD_NUMBER);
-            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+            request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
             return forward;
         }
         double amount;
@@ -43,7 +46,7 @@ public class MakePaymentCommand implements Command{
             amount = Double.parseDouble(request.getParameter("amount"));
         } catch (NumberFormatException exception) {
             LOG.warn("Cannot parse amount");
-            request.setAttribute("errorMessage", Message.INVALID_AMOUNT);
+            request.setAttribute("errorMessage",  rb.getString("message.invAmount"));
             return forward;
         }
         PaymentStatus ps = null;
@@ -52,25 +55,25 @@ public class MakePaymentCommand implements Command{
             ps = PaymentStatus.valueOf(request.getParameter("prepareOrSend"));
         } catch (IllegalArgumentException exception) {
             LOG.warn("Cannot parse payment status");
-            request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+            request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
             return forward;
         }
         boolean valid = true;
         if (!checkNumber(numberTo)) {
             LOG.trace(Message.INVALID_CARD_NUMBER);
-            session.setAttribute("invalidCardToNumber", Message.INVALID_CARD_NUMBER);
+            session.setAttribute("invalidCardToNumber", rb.getString("message.invNumber"));
             valid = false;
         }
         if (!checkAmount(amount, card)) {
             LOG.trace(Message.INVALID_AMOUNT);
             if(card.getBalance() >= amount)
-                session.setAttribute("invalidAmount", Message.INVALID_AMOUNT);
-            else session.setAttribute("invalidAmount", Message.HAVE_NO_MONEY);
+                session.setAttribute("invalidAmount", rb.getString("message.invAmount"));
+            else session.setAttribute("invalidAmount", rb.getString("message.haveNoMoney"));
             valid = false;
         }
         if (card.getNumber().equals(numberTo)) {
             LOG.trace("Enter another card");
-            session.setAttribute("anotherCard", "Enter another card");
+            session.setAttribute("anotherCard", rb.getString("message.anotherCard"));
             valid = false;
         }
         if (valid) {
@@ -88,19 +91,19 @@ public class MakePaymentCommand implements Command{
                     forward = Path.RESULT_PAGE;
                 } else {
                     LOG.warn("Payment error");
-                    request.setAttribute("errorMessage", "Payment error");
+                    request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
                 }
             }
             if(ps == PaymentStatus.PREPARED)
             {
                 if (dbManager.preparePayment(payment)) {
                     LOG.trace("Payment is prepared");
-                    session.setAttribute("resultTitle", "Success");
-                    session.setAttribute("resultMessage", Message.PAYMENT_PREPARED);
+                    session.setAttribute("resultTitle", rb.getString("message.success"));
+                    session.setAttribute("resultMessage", rb.getString("message.paymentPrep"));
                     forward = Path.RESULT_PAGE;
                 } else {
                     LOG.warn("Payment error");
-                    request.setAttribute("errorMessage", Message.CANNOT_MAKE_PAYMENT);
+                    request.setAttribute("errorMessage", rb.getString("message.cannotMakePayment"));
                 }
             }
         } else {

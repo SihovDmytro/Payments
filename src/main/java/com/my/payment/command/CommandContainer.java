@@ -16,6 +16,7 @@ public class CommandContainer {
         commands.put("logout",new LogoutCommand());
         commands.put("getCards",new GetCardsCommand());
         commands.put("addCard",new NewCardCommand());
+        commands.put("createCard",new CreateCardCommand());
         commands.put("getPayments",new GetPaymentsForCardCommand());
         commands.put("makePayment",new MakePaymentCommand());
         commands.put("commitPayment",new CommitPaymentCommand());
