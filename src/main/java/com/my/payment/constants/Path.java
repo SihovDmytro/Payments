@@ -5,7 +5,7 @@ public class Path {
     public static final String RESULT_PAGE="resultPage.jsp";
     public static final String USER_CABINET="account.jsp";
     public static final String USERS_PAGE="/WEB-INF/jsp/users.jsp";
-    public static final String ERROR_PAGE="/WEB-INF/jsp/errorPage.jsp";
+    public static final String ERROR_PAGE="errorPage.jsp";
     public static final String REGISTRATION_PAGE="registration.jsp";
     public static final String CARDS_PAGE="cards.jsp";
     public static final String NEW_CARD_PAGE="newCard.jsp";

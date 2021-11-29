@@ -23,7 +23,7 @@ public class ChangeCardStatusCommand implements Command{
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String forward = Path.ERROR_PAGE;
-        HttpSession s = request.getSession();
+        HttpSession session = request.getSession();
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         LOG.trace("resBundle ==> "+rb);
         int cardID;
@@ -33,14 +33,14 @@ public class ChangeCardStatusCommand implements Command{
         }catch (NumberFormatException exception)
         {
             LOG.trace(Message.CANNOT_CHANGE_STATUS);
-            request.setAttribute("errorMessage", rb.getString("message.cannotChangeCardStatus"));
+            session.setAttribute("ErrorMessage", rb.getString("message.cannotChangeCardStatus"));
             return forward;
         }
-        User user = (User) s.getAttribute("currUser");
+        User user = (User) session.getAttribute("currUser");
         if(user.getRole()!= Role.ADMIN && !checkCardID(cardID,user))
         {
             LOG.trace("You haven't this card");
-            request.setAttribute("errorMessage", rb.getString("message.haveNoCard"));
+            session.setAttribute("ErrorMessage", rb.getString("message.haveNoCard"));
             return forward;
         }
         Status newStatus = null;
@@ -49,7 +49,7 @@ public class ChangeCardStatusCommand implements Command{
             LOG.trace("Status ==> "+newStatus.toString());
         }catch (NumberFormatException e){
             LOG.trace("Cannot parse newStatus");
-            request.setAttribute("errorMessage", rb.getString("message.cannotChangeCardStatus"));
+            session.setAttribute("ErrorMessage", rb.getString("message.cannotChangeCardStatus"));
             return forward;
         }
         DBManager dbManager = DBManager.getInstance();
@@ -59,7 +59,7 @@ public class ChangeCardStatusCommand implements Command{
             forward=Path.GET_CARDS_COMMAND;
 
         }else {
-            request.setAttribute("errorMessage",rb.getString("message.cannotChangeCardStatus"));
+            session.setAttribute("ErrorMessage",rb.getString("message.cannotChangeCardStatus"));
         }
         return forward;
     }

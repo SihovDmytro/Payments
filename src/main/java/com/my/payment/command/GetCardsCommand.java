@@ -25,9 +25,9 @@ public class GetCardsCommand implements Command{
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.trace("GetCardsCommand starts");
         List<Card> cards=null;
-        HttpSession s = request.getSession();
-        User user = (User) s.getAttribute("currUser");
-        Role role = (Role) s.getAttribute("userRole");
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("currUser");
+        Role role = (Role) session.getAttribute("userRole");
         DBManager dbManager = DBManager.getInstance();
         if(role == Role.USER)
             cards = dbManager.getCardsForUser(user);

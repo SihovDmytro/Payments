@@ -9,28 +9,30 @@ import java.util.TreeMap;
 public class CommandContainer {
     private static final Logger LOG = LogManager.getLogger(CommandContainer.class);
     private static Map<String, Command> commands = new TreeMap<>();
+
     static {
-        commands.put("login",new LoginCommand());
-        commands.put("errorCommand",new ErrorCommand());
+        commands.put("login", new LoginCommand());
+        commands.put("errorCommand", new ErrorCommand());
         commands.put("registration", new RegistrationCommand());
-        commands.put("logout",new LogoutCommand());
-        commands.put("getCards",new GetCardsCommand());
-        commands.put("addCard",new NewCardCommand());
-        commands.put("createCard",new CreateCardCommand());
-        commands.put("getPayments",new GetPaymentsForCardCommand());
-        commands.put("makePayment",new MakePaymentCommand());
-        commands.put("commitPayment",new CommitPaymentCommand());
-        commands.put("changeCardStatus",new ChangeCardStatusCommand());
-        commands.put("topUp",new TopUpCommand());
+        commands.put("logout", new LogoutCommand());
+        commands.put("getCards", new GetCardsCommand());
+        commands.put("addCard", new NewCardCommand());
+        commands.put("createCard", new CreateCardCommand());
+        commands.put("getPayments", new GetPaymentsForCardCommand());
+        commands.put("makePayment", new MakePaymentCommand());
+        commands.put("commitPayment", new CommitPaymentCommand());
+        commands.put("changeCardStatus", new ChangeCardStatusCommand());
+        commands.put("topUp", new TopUpCommand());
         commands.put("changeLocale", new ChangeLocaleCommand());
-        commands.put("getUsers",new GetUsersCommand());
-        commands.put("changeUserStatus",new ChangeUserStatusCommand());
+        commands.put("getUsers", new GetUsersCommand());
+        commands.put("changeUserStatus", new ChangeUserStatusCommand());
+        commands.put("cancelPayment", new CancelPaymentCommand());
 
     }
-    public static Command get(String commandName)
-    {
+
+    public static Command get(String commandName) {
         if (commandName == null || !commands.containsKey(commandName)) {
-            LOG.warn("Command not found ==> "+commandName);
+            LOG.warn("Command not found ==> " + commandName);
             return commands.get("errorCommand");
         }
         return commands.get(commandName);

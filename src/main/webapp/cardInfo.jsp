@@ -14,6 +14,24 @@
             <td class="content">
                 <span><fmt:message key='card.name'/>: </span>
                 ${sessionScope.currCard.name}
+
+                <c:if test="${sessionScope.userRole==Role.USER}">
+                    <br>
+                    <c:if test="${not empty sessionScope.invalidName}">
+                        ${sessionScope.invalidName}
+                    </c:if>
+                    <form action="controller" method="post">
+                        <input type="hidden" name="command" value="changeCardName">
+                        <div class="windowName" >
+                            <label for="cardName" ><fmt:message key='card.name'/></label>
+                            <input type ="text" id="cardName" name = "cardName" required maxlength="45"/>
+                            <button type="submit"><fmt:message key='payment.commit'/></button>
+                            <br>
+                        </div>
+                    </form>
+                    <a href="#windowName"><fmt:message key='card.topUpBal'/></a>
+                </c:if>
+
                 <hr>
                 <span><fmt:message key='card.number'/>: </span>
                 ${sessionScope.currCard.number}
@@ -30,14 +48,14 @@
                     </c:if>
                     <form action="controller" method="post">
                         <input type="hidden" name="command" value="topUp">
-                        <div id="okno" >
+                        <div id="windowTopUp" >
                             <label for="topUp" ><fmt:message key='card.amount'/></label>
                             <input type ="number" id="topUp" name = "topUp" required step="0.01" min="1" max="999999999"/>
                             <button type="submit"><fmt:message key='card.topUp'/></button>
                             <br>
                         </div>
                     </form>
-                    <a href="#okno"><fmt:message key='card.topUpBal'/></a>
+                    <a href="#windowTopUp"><fmt:message key='card.topUpBal'/></a>
                 </c:if>
                 <hr>
                 <span><fmt:message key='label.status'/>: </span>
@@ -52,12 +70,15 @@
                 </c:if>
                 <hr>
                 <span>CVV: </span>
-                ${sessionScope.currCard.cvv}
+                <nf:numberFormat number="3">${sessionScope.currCard.cvv}</nf:numberFormat>
+                <hr>
+                <span>PIN: </span>
+                <nf:numberFormat number="4">${sessionScope.currCard.pin}</nf:numberFormat>
                 <hr>
                 <table id = "mydatatable" class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th><fmt:message key='header.inOut'/></th>
+                        <th></th>
                         <th><fmt:message key='header.from'/></th>
                         <th><fmt:message key='header.to'/></th>
                         <th><fmt:message key='card.amount'/></th>
@@ -82,11 +103,17 @@
                                             <fmt:message key='payment.status.prep'/>
                                         </c:if>
                                         <c:if test="${item.status == PaymentStatus.PREPARED and item.from.balance>=item.amount and sessionScope.userRole==Role.USER}">
-                                            <br>
                                             <form action="controller" method="post">
                                                 <input type="hidden" name="command" value="commitPayment">
                                                 <input type="hidden" name="paymentID" value="${item.id}">
                                                 <button type="submit"><fmt:message key='payment.commit'/></button>
+                                            </form>
+                                        </c:if>
+                                        <c:if test="${item.status == PaymentStatus.PREPARED and sessionScope.userRole==Role.USER}">
+                                            <form action="controller" method="post">
+                                                <input type="hidden" name="command" value="cancelPayment">
+                                                <input type="hidden" name="paymentID" value="${item.id}">
+                                                <button type="submit"><fmt:message key='payment.cancel'/></button>
                                             </form>
                                         </c:if>
                                     </td>

@@ -18,58 +18,53 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class TopUpCommand implements Command{
+public class TopUpCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(TopUpCommand.class);
+
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("TopUpCommand start");
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
-        LOG.trace("resBundle ==> "+rb);
+        LOG.trace("resBundle ==> " + rb);
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
         Card card = (Card) session.getAttribute("currCard");
-        LOG.trace("card parameter ==> "+card);
+        LOG.trace("card parameter ==> " + card);
         DBManager dbManager = DBManager.getInstance();
-        if(card == null || card.getStatus()== Status.BLOCKED )
-        {
+        if (card == null || card.getStatus() == Status.BLOCKED) {
             LOG.trace(Message.CARD_IS_BLOCKED);
-            request.setAttribute("errorMessage", rb.getString("message.cardBlocked"));
+            session.setAttribute("ErrorMessage", rb.getString("message.cardBlocked"));
             return forward;
         }
         double amount;
         try {
             amount = Double.parseDouble(request.getParameter("topUp"));
-        }catch (NumberFormatException exception)
-        {
+        } catch (NumberFormatException exception) {
             LOG.warn("Cannot parse amount");
-            request.setAttribute("errorMessage",rb.getString("message.invAmount"));
+            session.setAttribute("ErrorMessage", rb.getString("message.invAmount"));
             return forward;
         }
-        LOG.trace("Amount ==> "+amount);
-        if(!checkAmount(amount,card))
-        {
-            forward=Path.GET_CARD_INFO_COMMAND+"&cardItem="+card.getCardID();
+        LOG.trace("Amount ==> " + amount);
+        if (!checkAmount(amount, card)) {
+            forward = Path.GET_CARD_INFO_COMMAND + "&cardItem=" + card.getCardID();
             LOG.trace("Amount out of bounds");
-            session.setAttribute("amountLimit",rb.getString("message.maxAmount")+" = "+ BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
-        }
-        else {
-            if(!dbManager.topUpCard(card,amount))
-            {
+            session.setAttribute("amountLimit", rb.getString("message.maxAmount") + " = " + BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
+        } else {
+            if (!dbManager.topUpCard(card, amount)) {
                 LOG.warn(Message.CANNOT_TOP_UP);
-                request.setAttribute("errorMessage", rb.getString("message.cannotTopUp"));
+                session.setAttribute("ErrorMessage", rb.getString("message.cannotTopUp"));
                 return Path.ERROR_PAGE;
-            }
-            else {
+            } else {
                 LOG.warn(Message.TOP_UP_SUCCESS);
-                session.setAttribute("resultTitle",rb.getString("message.success"));
+                session.setAttribute("resultTitle", rb.getString("message.success"));
                 session.setAttribute("resultMessage", rb.getString("message.topUpSuccess"));
-                forward=Path.RESULT_PAGE;
+                forward = Path.RESULT_PAGE;
             }
         }
         return forward;
     }
-    private boolean checkAmount(double amount,Card card)
-    {
+
+    private boolean checkAmount(double amount, Card card) {
         return !(card.getBalance() + amount > 999999999);
     }
 }

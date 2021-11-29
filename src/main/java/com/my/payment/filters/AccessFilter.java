@@ -32,13 +32,15 @@ public class AccessFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         LOG.debug("Filter starts");
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpSession session =  req.getSession();
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         LOG.trace("resBundle ==> "+rb);
         if (checkAccess(request)) {
             LOG.debug("Filter finished");
             chain.doFilter(request, response);
         } else {
-            request.setAttribute("errorMessage", rb.getString("message.noPermission"));
+            session.setAttribute("ErrorMessage", rb.getString("message.noPermission"));
             LOG.trace(rb.getString("message.noPermission"));
 
             request.getRequestDispatcher(Path.ERROR_PAGE)

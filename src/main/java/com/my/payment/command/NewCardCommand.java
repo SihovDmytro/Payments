@@ -21,48 +21,45 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewCardCommand implements Command{
+public class NewCardCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(NewCardCommand.class);
+
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("NewCardCommand starts");
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
-        LOG.trace("resBundle ==> "+rb);
+        LOG.trace("resBundle ==> " + rb);
         HttpSession session = request.getSession();
         String cardNumber = request.getParameter("cardNumber");
-        LOG.trace("Parameter cardNumber ==> "+cardNumber);
+        LOG.trace("Parameter cardNumber ==> " + cardNumber);
         String cvv = request.getParameter("cvv");
-        LOG.trace("Parameter cvv ==> "+cvv);
+        LOG.trace("Parameter cvv ==> " + cvv);
         String pin = request.getParameter("pin");
-        LOG.trace("Parameter pin ==> "+pin);
+        LOG.trace("Parameter pin ==> " + pin);
         String expDate = request.getParameter("exp-date");
-        LOG.trace("Parameter exp-date ==> "+expDate);
+        LOG.trace("Parameter exp-date ==> " + expDate);
         boolean valid = true;
-        if(!checkExpDate(expDate))
-        {
+        if (!checkExpDate(expDate)) {
             LOG.trace(Message.INVALID_EXPIRATION_DATE);
-            session.setAttribute("invalidExpDate",rb.getString("message.invalidExpDate"));
-            valid=false;
+            session.setAttribute("invalidExpDate", rb.getString("message.invalidExpDate"));
+            valid = false;
         }
-        if(!checkNumber(cardNumber))
-        {
+        if (!checkNumber(cardNumber)) {
             LOG.trace(Message.INVALID_CARD_NUMBER);
-            session.setAttribute("invalidNumber",rb.getString("message.invalidCardNumber"));
-            valid=false;
+            session.setAttribute("invalidNumber", rb.getString("message.invalidCardNumber"));
+            valid = false;
         }
-        if(!checkCVV(cvv))
-        {
+        if (!checkCVV(cvv)) {
             LOG.trace(Message.INVALID_CVV);
-            session.setAttribute("invalidCVV",rb.getString("message.invalidCVV"));
-            valid=false;
+            session.setAttribute("invalidCVV", rb.getString("message.invalidCVV"));
+            valid = false;
         }
-        if(!checkPIN(pin))
-        {
+        if (!checkPIN(pin)) {
             LOG.trace("Invalid PIN");
-            session.setAttribute("invalidPIN",rb.getString("message.invalidPIN"));
-            valid=false;
+            session.setAttribute("invalidPIN", rb.getString("message.invalidPIN"));
+            valid = false;
         }
-        if(valid) {
+        if (valid) {
             LOG.trace("Valid parameters");
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(Date.valueOf(expDate));
@@ -91,45 +88,43 @@ public class NewCardCommand implements Command{
                 LOG.trace("Wrong endDate/cvv/pin");
                 session.setAttribute("wrongData", rb.getString("message.wrongData"));
             }
-        }else {
+        } else {
             LOG.trace("invalid parameters");
         }
         return Path.NEW_CARD_PAGE;
     }
 
-    private boolean checkExpDate(String txt)
-    {
-        if(txt==null) return false;
-        try{
-            Calendar calendar =  Calendar.getInstance();
+    private boolean checkExpDate(String txt) {
+        if (txt == null) return false;
+        try {
+            Calendar calendar = Calendar.getInstance();
             calendar.setTime(Date.valueOf(txt));
-            int year= calendar.get(Calendar.YEAR);
-            int currYear= Calendar.getInstance().get(Calendar.YEAR);
-            return Math.abs(year-currYear)<=5;
-        }
-        catch (IllegalArgumentException exception){
+            int year = calendar.get(Calendar.YEAR);
+            int currYear = Calendar.getInstance().get(Calendar.YEAR);
+            return Math.abs(year - currYear) <= 5;
+        } catch (IllegalArgumentException exception) {
             return false;
         }
     }
-    private boolean checkCVV(String txt)
-    {
-        if(txt==null) return false;
+
+    private boolean checkCVV(String txt) {
+        if (txt == null) return false;
         Pattern p = Pattern.compile("^\\d{3}$");
         Matcher m = p.matcher(txt);
-        return m.find() && txt.length()==3;
+        return m.find() && txt.length() == 3;
     }
-    private boolean checkNumber(String txt)
-    {
-        if(txt==null) return false;
+
+    private boolean checkNumber(String txt) {
+        if (txt == null) return false;
         Pattern p = Pattern.compile("^\\d{16}$");
         Matcher m = p.matcher(txt);
-        return m.find() && txt.length()==16;
+        return m.find() && txt.length() == 16;
     }
-    private boolean checkPIN(String txt)
-    {
-        if(txt==null) return false;
+
+    private boolean checkPIN(String txt) {
+        if (txt == null) return false;
         Pattern p = Pattern.compile("^\\d{4}$");
         Matcher m = p.matcher(txt);
-        return m.find() && txt.length()==4;
+        return m.find() && txt.length() == 4;
     }
 }

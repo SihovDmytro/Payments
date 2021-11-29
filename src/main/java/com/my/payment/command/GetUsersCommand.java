@@ -12,15 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-public class GetUsersCommand implements Command{
+public class GetUsersCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(GetUsersCommand.class);
+
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.trace("GetUsersCommand starts");
         DBManager dbManager = DBManager.getInstance();
         List<User> users = dbManager.getAllUsers();
-        LOG.trace("Users ==> "+users);
-        request.setAttribute("users",users);
+        LOG.trace("Users ==> " + users);
+        request.setAttribute("users", users);
         return Path.USERS_PAGE;
     }
 }

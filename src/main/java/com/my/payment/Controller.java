@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -33,6 +34,7 @@ public class Controller extends HttpServlet {
 
         logger.trace("Parameter command ==>"+commandName);
         Command command = CommandContainer.get(commandName);
+        HttpSession session = request.getSession();
         logger.trace("Obtained command ==>"+commandName);
         String forward = Path.ERROR_PAGE;
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
@@ -41,7 +43,7 @@ public class Controller extends HttpServlet {
             forward = command.execute(request, response);
         } catch (Exception ex) {
             logger.warn("Execute exception ==>"+ex);
-            request.setAttribute("errorMessage", rb.getString("message.unknownErr"));
+            session.setAttribute("ErrorMessage", rb.getString("message.unknownErr"));
         }
         if (forward.equals("resultPage.jsp"))
         {
@@ -54,6 +56,7 @@ public class Controller extends HttpServlet {
     }
     private void processPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String commandName = request.getParameter("command");
+        HttpSession session = request.getSession();
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         logger.trace("resBundle ==> "+rb);
         logger.trace("Parameter command ==>"+commandName);
@@ -64,7 +67,7 @@ public class Controller extends HttpServlet {
             redirect = command.execute(request, response);
         } catch (Exception ex) {
             logger.warn("Execute exception ==>"+ex);
-            request.setAttribute("errorMessage", rb.getString("message.unknownErr"));
+            session.setAttribute("ErrorMessage", rb.getString("message.unknownErr"));
         }
         logger.trace("Redirect ==> " + redirect);
         response.sendRedirect(redirect);

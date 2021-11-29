@@ -13,20 +13,20 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class ChangeLocaleCommand implements Command{
+public class ChangeLocaleCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(ChangeLocaleCommand.class);
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LOG.debug("ChangeLocaleCommand starts");
         String lang = request.getParameter("language");
-        LOG.trace("lang parameter ==> "+lang);
-        request.getServletContext().setAttribute("language",lang);
+        LOG.trace("lang parameter ==> " + lang);
+        request.getServletContext().setAttribute("language", lang);
         HttpSession session = request.getSession();
         Locale locale = new Locale(lang);
-        ResourceBundle rb = ResourceBundle.getBundle("localization",locale);
-        request.getServletContext().setAttribute("resBundle",rb);
-        LOG.trace("resBundle ==> "+rb);
+        ResourceBundle rb = ResourceBundle.getBundle("localization", locale);
+        request.getServletContext().setAttribute("resBundle", rb);
+        LOG.trace("resBundle ==> " + rb);
         session.setAttribute("resultTitle", "Success");
         session.setAttribute("resultMessage", "Language is changed");
         return Path.RESULT_PAGE;

@@ -9,7 +9,7 @@
     <%@ include file="/WEB-INF/jspf/changeLocale.jspf"%>
     <tr>
         <td class="content center">
-            ${requestScope.errorMessage}<br>
+            ${sessionScope.ErrorMessage}<br>
             <a href="${Path.LOGIN_PAGE}"><fmt:message key='page.login'/></a>
             <c:if test="${not empty sessionScope.currUser}">
                 <a href="${Path.USER_CABINET}"><fmt:message key='page.Cabinet'/></a>
@@ -17,6 +17,7 @@
                     <a href="${Path.GET_CARD_INFO_COMMAND}&cardItem=${sessionScope.currCard.cardID}"><fmt:message key='page.card'/></a>
                 </c:if>
             </c:if>
+            <c:remove var="ErrorMessage" scope="session"/>
         </td>
     </tr>
 </table>

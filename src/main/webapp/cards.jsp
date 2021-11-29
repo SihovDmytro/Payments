@@ -39,7 +39,7 @@
                             </td>
                             <td>${item.balance}</td>
                             <td>${item.textDate}</td>
-                            <td>${item.cvv}</td>
+                            <td><nf:numberFormat number="3">${item.cvv}</nf:numberFormat></td>
                             <td>
                                <c:if test="${item.status==Status.BLOCKED}">
                                    <fmt:message key='card.status.blocked'/>
@@ -71,9 +71,6 @@
                                             </c:if>
                                         </c:when>
                                         <c:when test="${item.status == Status.UNBLOCK_REQUEST}">
-                                            <c:if test="${sessionScope.userRole == Role.USER}">
-                                                <fmt:message key='card.status.reqSent'/>
-                                            </c:if>
                                             <c:if test="${sessionScope.userRole == Role.ADMIN}">
                                                 <input type="hidden" name="newStatus" value="${Status.ACTIVE}">
                                                 <button type="submit"><fmt:message key='card.status.unblock'/></button>

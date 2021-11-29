@@ -68,10 +68,9 @@ public class CreateCardCommand implements Command{
             Card card = new Card(name,cardNumber,Calendar.getInstance(),Integer.parseInt(cvv),0, Status.ACTIVE,Integer.parseInt(pin));
             LOG.trace("Formed card ==> "+ card);
             User user = (User) session.getAttribute("currUser");
-            if(dbManager.getCardByNumber(card.getNumber())!=null)
-            {
+            if (dbManager.getCardByNumber(card.getNumber()) != null) {
                 LOG.trace("This number already exists");
-                session.setAttribute("alreadyExist",rb.getString("message.numberExists"));
+                session.setAttribute("alreadyExist", rb.getString("message.numberExists"));
                 return Path.CREATE_CARD_PAGE;
             }
             if(dbManager.createNewCard(card,user))

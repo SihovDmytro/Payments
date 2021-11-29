@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 public class ContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+
         ServletContext servletContext = sce.getServletContext();
         String path = servletContext.getRealPath("/WEB-INF/Payments.log");
         System.setProperty("logFile", path);

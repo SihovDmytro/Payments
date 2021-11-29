@@ -10,17 +10,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-public class LogoutCommand implements Command{
+public class LogoutCommand implements Command {
     private static final Logger logger = LogManager.getLogger(LogoutCommand.class);
+
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         logger.debug("LogoutCommand starts");
-        HttpSession s = request.getSession(false);
-        logger.trace("Current session ==> "+s);
-        if (s != null) {
-            s.invalidate();
+        HttpSession session = request.getSession(false);
+        logger.trace("Current session ==> " + session);
+        if (session != null) {
+            session.invalidate();
         }
         logger.debug("Session is invalidated");
-        return "/"+Path.LOGIN_PAGE;
+        return "/" + Path.LOGIN_PAGE;
     }
 }
