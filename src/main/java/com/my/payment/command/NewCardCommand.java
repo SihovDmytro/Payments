@@ -21,6 +21,10 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * New card command. Add existing card to user
+ * @author Sihov Dmytro
+ */
 public class NewCardCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(NewCardCommand.class);
 

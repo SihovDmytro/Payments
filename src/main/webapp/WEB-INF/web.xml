@@ -19,7 +19,7 @@
         </init-param>
         <init-param>
             <param-name>user</param-name>
-            <param-value>getCards getUserInfo logout addCard getPayments makePayment commitPayment changeCardStatus topUp createCard cancelPayment</param-value>
+            <param-value>getCards getUserInfo logout addCard getPayments makePayment commitPayment changeCardStatus topUp createCard cancelPayment changeCardName</param-value>
         </init-param>
         <init-param>
             <param-name>common</param-name>

@@ -1,13 +1,14 @@
 package com.my.payment.myTag;
-import com.my.payment.command.NewCardCommand;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
 import java.io.StringWriter;
 
+/**
+ * Class contains functionality that fills spaces with zeros
+ * @author Sihov Dmytro
+ */
 public class NumberFormat extends SimpleTagSupport{
     private int number;
     StringWriter sw = new StringWriter();

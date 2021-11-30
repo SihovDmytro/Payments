@@ -7,7 +7,8 @@
 <body>
 <table id ="main-container">
     <%@ include file="/WEB-INF/jspf/changeLocale.jspf"%>
-    <%@include file="/WEB-INF/jspf/header.jspf"%>
+    <%@ include file="/WEB-INF/jspf/header.jspf"%>
+    <%@ include file="/WEB-INF/jspf/scripts.jspf"%>
     <tr>
         <td class="content">
             <form action="controller" method="post">
@@ -49,12 +50,11 @@
                     <h1 ><fmt:message key='card.add'/></h1>
                     <hr>
 
-                    <script src="myScript.js"></script>
                     <label for="cardNumber"><fmt:message key='card.number'/>*</label>
                     <input type="text"  name="cardNumber" id="cardNumber" required maxlength="16" minlength="16" onkeypress="return onlyNumberKey(event)">
 
                     <label for="cvv">CVV*</label>
-                    <input type="text" name="cvv" id="cvv" required maxlength="3" minlength="3" onkeypress="return onlyNumberKey(event)">
+                    <input type="text" name="cvv" id="cvv" required maxlength="3" minlength="3" onkeypress="return onlyNumberKey(event)" >
 
                     <label for="pin">PIN*</label>
                     <input type="text" name="pin" id="pin" required maxlength="4" minlength="4" onkeypress="return onlyNumberKey(event)">
@@ -76,7 +76,7 @@
             <c:remove var="invalidExpDate" scope="session"/>
         </td>
     </tr>
-
+    <script src="myScript.js"></script>
 </table>
 </body>
 </html>

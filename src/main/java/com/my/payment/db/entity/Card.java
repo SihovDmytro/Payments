@@ -2,12 +2,16 @@ package com.my.payment.db.entity;
 
 import com.my.payment.db.Status;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class Card {
+/**
+ *  Card bean
+ */
+public class Card implements Serializable {
     private int cardID;
     private String name;
     private String number;

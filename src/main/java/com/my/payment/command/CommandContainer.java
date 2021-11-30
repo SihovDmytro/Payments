@@ -6,6 +6,10 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Contains all command
+ * @author Sihov Dmytro
+ */
 public class CommandContainer {
     private static final Logger LOG = LogManager.getLogger(CommandContainer.class);
     private static Map<String, Command> commands = new TreeMap<>();
@@ -27,6 +31,7 @@ public class CommandContainer {
         commands.put("getUsers", new GetUsersCommand());
         commands.put("changeUserStatus", new ChangeUserStatusCommand());
         commands.put("cancelPayment", new CancelPaymentCommand());
+        commands.put("changeCardName", new ChangeCardNameCommand());
 
     }
 

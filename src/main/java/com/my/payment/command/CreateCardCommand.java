@@ -20,6 +20,10 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Create card command. Creates a new card in DB and adds it to user
+ * @author Sihov Dmytro
+ */
 public class CreateCardCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(CreateCardCommand.class);
     @Override

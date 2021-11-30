@@ -5,19 +5,19 @@ import com.my.payment.db.DBManager;
 import com.my.payment.db.Role;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
-import com.my.payment.util.Sorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Get cards command
+ * @author Sihov Dmytro
+ */
 public class GetCardsCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(LoginCommand.class);
 

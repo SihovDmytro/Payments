@@ -6,17 +6,19 @@ import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/***
+ * Class for work with DB
+ * @author Sihov Dmytro
+ */
 public class DBManager {
     private static final Logger LOG = LogManager.getLogger(DBManager.class);
     private static final String FIND_USER = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status FROM user u join roles r on u.roles_id=r.id WHERE login=?";
@@ -39,10 +41,14 @@ public class DBManager {
     private static final String CHANGE_USER_STATUS = "UPDATE user SET status = ? WHERE id=?";
     private static final String GET_PAYMENT_BY_ID = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE p.id=?";
     private static final String COMMIT_PAYMENT = "UPDATE payment SET status='sent', date=current_timestamp()  WHERE id=?";
-    private static final String CANCEL_PAYMENT="DELETE FROM payment WHERE (id = ?);";
+    private static final String CANCEL_PAYMENT="DELETE FROM payment WHERE (id = ?)";
+    private static final String CHANGE_CARD_NAME="UPDATE card SET name=? WHERE id=?";
     private static DBManager dbManager;
     private DataSource ds;
 
+    /**
+     * Class constructor
+     */
     private DBManager() {
         try {
             Context initContext = new InitialContext();
@@ -55,6 +61,10 @@ public class DBManager {
         }
     }
 
+    /**
+     * gets connection with database
+     * @return Connection
+    */
     public Connection getConnection() {
         Connection con = null;
         try {
@@ -66,6 +76,10 @@ public class DBManager {
         return con;
     }
 
+    /**
+     * Singleton
+     * @return instance of DBManager
+     */
     public static synchronized DBManager getInstance() {
         if (dbManager == null) {
             dbManager = new DBManager();
@@ -73,12 +87,22 @@ public class DBManager {
         return dbManager;
     }
 
+    /**
+     * Closes connection, resultset and statement
+     * @param con Connection
+     * @param statement Statement
+     * @param rs ResultSet
+     */
     private void close(Connection con, Statement statement, ResultSet rs) {
         close(rs);
         close(con);
         close(statement);
     }
 
+    /**
+     * Closes ResultSet
+     * @param rs ResultSet
+     */
     private void close(ResultSet rs) {
         if (rs != null) {
             try {
@@ -90,6 +114,10 @@ public class DBManager {
         }
     }
 
+    /**
+     * Closes Statement
+     * @param st Statement
+     */
     private void close(Statement st) {
         if (st != null) {
             try {
@@ -101,6 +129,10 @@ public class DBManager {
         }
     }
 
+    /**
+     * Closes connection
+     * @param con Connection
+     */
     private void close(Connection con) {
         if (con != null) {
             try {
@@ -112,6 +144,11 @@ public class DBManager {
         }
     }
 
+    /**
+     * Selects user by login
+     * @param login user login
+     * @return User
+     */
     public User findUser(String login) {
         if (login == null) return null;
         PreparedStatement ps = null;
@@ -133,6 +170,11 @@ public class DBManager {
         return null;
     }
 
+    /**
+     * Inserts a new user
+     * @param user User object
+     * @return result
+     */
     public boolean addUser(User user) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -156,6 +198,12 @@ public class DBManager {
         return false;
     }
 
+    /**
+     * Trying to login
+     * @param login
+     * @param password
+     * @return result
+     */
     public boolean try2Login(String login, String password) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -176,6 +224,11 @@ public class DBManager {
         return false;
     }
 
+    /**
+     * Selects all cards for user
+     * @param user User object
+     * @return User objects list
+     */
     public List<Card> getCardsForUser(User user) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -201,6 +254,10 @@ public class DBManager {
         return cards;
     }
 
+    /**
+     * Selects all cards
+     * @return Card objects list
+     */
     public List<Card> getAllCards() {
         Statement s = null;
         Connection con = null;
@@ -225,6 +282,12 @@ public class DBManager {
         return cards;
     }
 
+    /**
+     * Inserts card for user
+     * @param card
+     * @param user
+     * @return operation result
+     */
     public boolean addCard(Card card, User user) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -247,6 +310,13 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Inserts a new card
+     * @param card
+     * @param user
+     * @param con
+     * @return operation result
+     */
     private boolean addNewCard(Card card, User user, Connection con) {
         PreparedStatement ps = null;
         boolean result = false;
@@ -267,6 +337,11 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Selects card by id
+     * @param id card id
+     * @return Card object
+     */
     public Card getCardByID(int id) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -291,6 +366,12 @@ public class DBManager {
         return card;
     }
 
+    /**
+     * Inserts a new card
+     * @param card
+     * @param user
+     * @return operation result
+     */
     public boolean createNewCard(Card card, User user) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -330,6 +411,12 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Checks if user already have this card
+     * @param card
+     * @param user
+     * @return operation result
+     */
     public boolean findCard(Card card, User user) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -354,6 +441,11 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Selects payments for card
+     * @param card
+     * @return Payments objects list
+     */
     public List<Payment> getPayments(Card card) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -405,6 +497,11 @@ public class DBManager {
         return payments;
     }
 
+    /**
+     * Selects payment by id
+     * @param id
+     * @return Payment object
+     */
     public Payment getPaymentByID(int id) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -438,6 +535,11 @@ public class DBManager {
         return payment;
     }
 
+    /**
+     * Selects card by number
+     * @param number card number
+     * @return Card object
+     */
     public Card getCardByNumber(String number) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -461,6 +563,11 @@ public class DBManager {
         return cardFrom;
     }
 
+    /**
+     * Confirms payment and makes transaction
+     * @param payment
+     * @return operation result
+     */
     public boolean commitPayment(Payment payment) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -493,6 +600,11 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Prepares payment
+     * @param payment
+     * @return operation result
+     */
     public boolean preparePayment(Payment payment) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -509,8 +621,6 @@ public class DBManager {
             ps.setString(5, payment.getStatus().toString().toLowerCase());
             if (ps.executeUpdate() > 0) {
                 result = true;
-            } else {
-                throw new SQLException();
             }
         } catch (SQLException exception) {
             LOG.warn("Cannot transfer");
@@ -521,6 +631,11 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Makes transaction
+     * @param payment
+     * @return
+     */
     public boolean makePayment(Payment payment) {
         PreparedStatement ps = null;
         Connection con = null;
@@ -562,6 +677,13 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Withdraws money from card
+     * @param id card id
+     * @param amount
+     * @param con Connection
+     * @throws SQLException
+     */
     private void withdraw(int id, double amount, Connection con) throws SQLException {
         PreparedStatement ps = null;
         try {
@@ -574,6 +696,14 @@ public class DBManager {
         }
     }
 
+    /**
+     * Transfers money to card
+     * @param id card id
+     * @param amount
+     * @param con Connection
+     * @return operation result
+     * @throws SQLException
+     */
     private boolean transfer(int id, double amount, Connection con) throws SQLException {
         PreparedStatement ps = null;
         boolean result;
@@ -589,7 +719,12 @@ public class DBManager {
         return result;
     }
 
-
+    /**
+     * Updates card status
+     * @param id card id
+     * @param status new status
+     * @return operation result
+     */
     public boolean changeCardStatus(int id, Status status) {
         boolean result = false;
         PreparedStatement ps = null;
@@ -600,10 +735,10 @@ public class DBManager {
             ps.setString(1, status.toString().toLowerCase());
             ps.setInt(2, id);
             int count = ps.executeUpdate();
-            if (count != 1) {
-                throw new SQLException();
+            if (count == 1) {
+                result = true;
             }
-            result = true;
+
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_CHANGE_STATUS);
         } finally {
@@ -613,6 +748,12 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Replenish the card
+     * @param c card object
+     * @param amount
+     * @return operation result
+     */
     public boolean topUpCard(Card c, double amount) {
         boolean result = false;
         Connection con = null;
@@ -627,6 +768,10 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Selects all users
+     * @return users objects list
+     */
     public List<User> getAllUsers() {
         Statement s = null;
         Connection con = null;
@@ -647,6 +792,12 @@ public class DBManager {
         return users;
     }
 
+    /**
+     * Updates user status
+     * @param id user id
+     * @param status new status
+     * @return operation result
+     */
     public boolean changeUserStatus(int id, Status status) {
         boolean result = false;
         PreparedStatement ps = null;
@@ -657,10 +808,9 @@ public class DBManager {
             ps.setString(1, status.toString().toLowerCase());
             ps.setInt(2, id);
             int count = ps.executeUpdate();
-            if (count != 1) {
-                throw new SQLException();
+            if (count == 1) {
+                result = true;
             }
-            result = true;
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_CHANGE_STATUS);
         } finally {
@@ -670,6 +820,11 @@ public class DBManager {
         return result;
     }
 
+    /**
+     * Cancels payment
+     * @param payment
+     * @return operation result
+     */
     public boolean cancelPayment(Payment payment)
     {
         PreparedStatement ps = null;
@@ -681,14 +836,43 @@ public class DBManager {
             ps.setInt(1, payment.getId());
             if (ps.executeUpdate() == 1) {
                 result = true;
-            } else throw new SQLException();
+            }
 
         } catch (SQLException exception) {
-            LOG.warn("Cannot make payment");
+            LOG.warn("Cannot cancel payment");
         } finally {
             close(con);
             close(ps);
         }
         return result;
     }
+
+    /**
+     * Updates card name
+     * @param card
+     * @param newName
+     * @return operation result
+     */
+    public boolean changeCardName(Card card, String newName)
+    {
+        boolean result=false;
+        Connection con =null;
+        PreparedStatement ps = null;
+        try{
+            con = dbManager.getConnection();
+            ps = con.prepareStatement(CHANGE_CARD_NAME);
+            ps.setString(1,newName);
+            ps.setInt(2,card.getCardID());
+            int count = ps.executeUpdate();
+            if(count==1)
+            {
+                result=true;
+            }
+        }catch (SQLException exception)
+        {
+            LOG.trace("Cannot change card name");
+        }
+        return result;
+    }
+
 }

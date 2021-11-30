@@ -5,7 +5,6 @@ import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
-import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,15 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Top up command
+ * Change card name command
  * @author Sihov Dmytro
  */
-public class TopUpCommand implements Command {
-    private static final Logger LOG = LogManager.getLogger(TopUpCommand.class);
+public class ChangeCardNameCommand implements Command{
+    private static final Logger LOG = LogManager.getLogger(ChangeCardNameCommand.class);
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -40,35 +38,27 @@ public class TopUpCommand implements Command {
             session.setAttribute("ErrorMessage", rb.getString("message.cardBlocked"));
             return forward;
         }
-        double amount;
-        try {
-            amount = Double.parseDouble(request.getParameter("topUp"));
-        } catch (NumberFormatException exception) {
-            LOG.warn("Cannot parse amount");
-            session.setAttribute("ErrorMessage", rb.getString("message.invAmount"));
-            return forward;
-        }
-        LOG.trace("Amount ==> " + amount);
-        if (!checkAmount(amount, card)) {
+        String newName = request.getParameter("cardName");
+        LOG.trace("Name ==> " + newName);
+        if (!checkName(newName)) {
             forward = Path.GET_CARD_INFO_COMMAND + "&cardItem=" + card.getCardID();
-            LOG.trace("Amount out of bounds");
-            session.setAttribute("amountLimit", rb.getString("message.maxAmount") + " = " + BigDecimal.valueOf(999999999D - card.getBalance()).toPlainString());
+            LOG.trace("Invalid card name");
+            session.setAttribute("invalidName", rb.getString("message.invalidCardName"));
         } else {
-            if (!dbManager.topUpCard(card, amount)) {
-                LOG.warn(Message.CANNOT_TOP_UP);
-                session.setAttribute("ErrorMessage", rb.getString("message.cannotTopUp"));
-                return Path.ERROR_PAGE;
+            if (!dbManager.changeCardName(card, newName)) {
+                LOG.warn("Cannot change card name");
+                session.setAttribute("ErrorMessage", rb.getString("message.cannotChangeCardName"));
+                forward = Path.ERROR_PAGE;
             } else {
                 LOG.warn(Message.TOP_UP_SUCCESS);
-                session.setAttribute("resultTitle", rb.getString("message.success"));
-                session.setAttribute("resultMessage", rb.getString("message.topUpSuccess"));
-                forward = Path.RESULT_PAGE;
+                forward = Path.GET_CARD_INFO_COMMAND + "&cardItem=" + card.getCardID();
             }
         }
         return forward;
     }
-
-    private boolean checkAmount(double amount, Card card) {
-        return !(card.getBalance() + amount > 999999999);
+    private boolean checkName(String txt)
+    {
+        if(txt==null) return true;
+        return txt.length() <= 45;
     }
 }

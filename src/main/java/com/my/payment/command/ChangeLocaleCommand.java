@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Change locale command
+ * @author Sihov Dmytro
+ */
 public class ChangeLocaleCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(ChangeLocaleCommand.class);
 

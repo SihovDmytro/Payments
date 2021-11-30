@@ -1,12 +1,14 @@
 package com.my.payment.util;
 
-import com.my.payment.command.LoginCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Class contains functionality that hashes passwords
+ * @author Sihov Dmytro
+ */
 public class PasswordHash {
     private static final Logger logger = LogManager.getLogger(PasswordHash.class);
 

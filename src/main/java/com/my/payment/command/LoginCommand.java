@@ -1,7 +1,5 @@
 package com.my.payment.command;
 
-import com.my.payment.Controller;
-import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Role;
@@ -9,7 +7,6 @@ import com.my.payment.db.entity.User;
 import com.my.payment.util.PasswordHash;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +15,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ResourceBundle;
 
+/**
+ * Login command
+ * @author Sihov Dmytro
+ */
 public class LoginCommand implements Command {
     private static final Logger logger = LogManager.getLogger(LoginCommand.class);
 

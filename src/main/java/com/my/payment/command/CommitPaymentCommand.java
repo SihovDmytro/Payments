@@ -17,6 +17,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+/**
+ * Commit payment command
+ * @author Sihov Dmytro
+ */
 public class CommitPaymentCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(CommitPaymentCommand.class);
 

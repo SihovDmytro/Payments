@@ -4,8 +4,12 @@ import com.my.payment.db.Role;
 import com.my.payment.db.Status;
 
 import javax.jws.soap.SOAPBinding;
+import java.io.Serializable;
 
-public class User {
+/**
+ * User bean
+ */
+public class User implements Serializable {
     private int userID;
     private String login;
     private Role role;
@@ -26,9 +30,6 @@ public class User {
         return userID;
     }
 
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
     public String getLogin() {
         return login;
     }
@@ -55,10 +56,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Status getStatus() {

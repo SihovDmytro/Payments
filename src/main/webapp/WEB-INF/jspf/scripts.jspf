@@ -4,6 +4,8 @@
 <script src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.6/js/responsive.bootstrap.min.js  "></script>
+<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js" ></script>--%>
+<%--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>--%>
 <script>
     $(document).ready(function() {
         var table = $('#mydatatable').DataTable( {

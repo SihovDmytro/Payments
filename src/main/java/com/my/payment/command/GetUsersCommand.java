@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Get all users command
+ * @author Sihov Dmytro
+ */
 public class GetUsersCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(GetUsersCommand.class);
 

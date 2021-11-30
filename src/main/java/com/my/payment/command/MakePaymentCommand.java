@@ -22,6 +22,10 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Make payment command
+ * @author Sihov Dmytro
+ */
 public class MakePaymentCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(MakePaymentCommand.class);
 

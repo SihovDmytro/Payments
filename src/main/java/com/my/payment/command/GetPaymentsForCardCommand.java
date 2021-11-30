@@ -8,6 +8,7 @@ import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
+import com.my.payment.util.Sorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +20,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Get payments for card
+ * @author Sihov Dmytro
+ */
 public class GetPaymentsForCardCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(GetPaymentsForCardCommand.class);
 
@@ -61,6 +66,7 @@ public class GetPaymentsForCardCommand implements Command {
         session.setAttribute("currCard", card);
 
         List<Payment> payments = dbManager.getPayments(card);
+        Sorter.sortPaymentsByDate(payments,true);
         request.setAttribute("payments", payments);
         LOG.trace("Payments ==> " + payments);
         forward = "/" + Path.CARD_INFO;

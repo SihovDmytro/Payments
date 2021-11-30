@@ -13,13 +13,17 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Checks if current user has command permission
+ * @author Sihov Dmytro
+ */
 public class AccessFilter implements Filter {
     private static final Logger LOG = LogManager.getLogger(AccessFilter.class);
-    private Map<Role, List<String>> accessMap = new HashMap<Role, List<String>>();
-    private List<String> commons = new ArrayList<String>();
-    private List<String> outOfControl = new ArrayList<String>();
+    private Map<Role, List<String>> accessMap = new HashMap<>();
+    private List<String> commons = new ArrayList<>();
+    private List<String> outOfControl = new ArrayList<>();
     @Override
-    public void init(FilterConfig fConfig) throws ServletException {
+    public void init(FilterConfig fConfig) {
         LOG.debug("Filter initialization starts");
         accessMap.put(Role.ADMIN, asList(fConfig.getInitParameter("admin")));
         accessMap.put(Role.USER, asList(fConfig.getInitParameter("user")));
@@ -72,7 +76,7 @@ public class AccessFilter implements Filter {
         return accessMap.get(userRole).contains(commandName) || commons.contains(commandName);
     }
     private List<String> asList(String str) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         StringTokenizer st = new StringTokenizer(str);
         while (st.hasMoreTokens()) {
             list.add(st.nextToken());

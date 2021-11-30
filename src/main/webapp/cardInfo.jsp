@@ -22,14 +22,14 @@
                     </c:if>
                     <form action="controller" method="post">
                         <input type="hidden" name="command" value="changeCardName">
-                        <div class="windowName" >
-                            <label for="cardName" ><fmt:message key='card.name'/></label>
+                        <div id="windowName" >
+                            <label for="cardName" ><fmt:message key='label.card.newName'/></label>
                             <input type ="text" id="cardName" name = "cardName" required maxlength="45"/>
-                            <button type="submit"><fmt:message key='payment.commit'/></button>
+                            <button type="submit"><fmt:message key='label.change'/></button>
                             <br>
                         </div>
                     </form>
-                    <a href="#windowName"><fmt:message key='card.topUpBal'/></a>
+                    <a href="#windowName"><fmt:message key='card.changeName'/></a>
                 </c:if>
 
                 <hr>
@@ -136,6 +136,7 @@
                     <a href="${Path.MAKE_PAYMENT_PAGE}"><fmt:message key='label.makePayment'/></a>
                 </c:if>
                 <c:remove var="amountLimit" scope="session"/>
+                <c:remove var="invalidName" scope="session"/>
             </td>
         </tr>
         <%@ include file="/WEB-INF/jspf/scripts.jspf"%>

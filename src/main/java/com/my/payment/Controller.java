@@ -16,6 +16,9 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+/**
+ * Main servlet
+ */
 @WebServlet(value = "/controller" , name = "Controller")
 public class Controller extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(Controller.class);
@@ -29,6 +32,13 @@ public class Controller extends HttpServlet {
         processPost(req,resp);
     }
 
+    /**
+     * Gets command from CommandContainer and executes it
+     * @param request
+     * @param response
+     * @throws IOException
+     * @throws ServletException
+     */
     private void process(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String commandName = request.getParameter("command");
 
@@ -54,7 +64,7 @@ public class Controller extends HttpServlet {
             dispatcher.forward(request, response);
         }
     }
-    private void processPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void processPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String commandName = request.getParameter("command");
         HttpSession session = request.getSession();
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");

@@ -7,9 +7,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Sorter class
+ * @author Sihov Dmytro
+ */
 public class Sorter {
-    private static final Comparator<Payment> SORT_PAYMENTS_BY_DATE = (o1, o2) -> o1.getDate().compareTo(o2.getDate());
-    public static final Comparator<Card> SORT_CARDS_BY_DATE = (o1, o2) -> o1.getDate().compareTo(o2.getDate());
+    private static final Comparator<Payment> SORT_PAYMENTS_BY_DATE = Comparator.comparing(Payment::getDate);
+    public static final Comparator<Card> SORT_CARDS_BY_DATE = Comparator.comparing(Card::getDate);
     public static void sortPaymentsByDate(List<Payment> payments,boolean rev)
     {
         if (rev)

@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Change card status command
+ * @author Sihov Dmytro
+ */
 public class ChangeCardStatusCommand implements Command{
     private static final Logger LOG = LogManager.getLogger(ChangeCardStatusCommand.class);
     @Override

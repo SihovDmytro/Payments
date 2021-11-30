@@ -2,10 +2,14 @@ package com.my.payment.db.entity;
 
 import com.my.payment.db.PaymentStatus;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
-public class Payment {
+/**
+ * Payment bean
+ */
+public class Payment implements Serializable {
     int id;
     Card from;
     Card to;
@@ -37,16 +41,8 @@ public class Payment {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
     public Card getFrom() {
         return from;
-    }
-
-    public void setFrom(Card from) {
-        this.from = from;
     }
 
     public Card getTo() {
