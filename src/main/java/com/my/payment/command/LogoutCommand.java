@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -26,6 +27,13 @@ public class LogoutCommand implements Command {
             session.invalidate();
         }
         logger.debug("Session is invalidated");
+        String pathPdf= System.getProperty("receipt");
+        File file = new File(pathPdf);
+        if(file.exists())
+        {
+            logger.trace("Delete receipt pdf file");
+            file.delete();
+        }
         return "/" + Path.LOGIN_PAGE;
     }
 }

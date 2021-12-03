@@ -20,5 +20,17 @@ public class ContextListener implements ServletContextListener {
         ResourceBundle rb = ResourceBundle.getBundle("localization",locale);
         System.out.println("resBundle ==> "+rb);
         servletContext.setAttribute("resBundle",rb);
+
+        path=servletContext.getRealPath("/WEB-INF/payment.xml");
+        System.setProperty("reportDataFile", path);
+        System.out.println("Report data ==> "+path);
+
+        path=servletContext.getRealPath("/WEB-INF/report_en_US.jrxml");
+        System.setProperty("reportTemplate", path);
+        System.out.println("Report template ==> "+path);
+
+        path=servletContext.getRealPath("receipt.pdf");
+        System.setProperty("receipt", path);
+        System.out.println("Report receipt ==> "+path);
     }
 }

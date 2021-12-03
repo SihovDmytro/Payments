@@ -98,6 +98,11 @@
                                     <td>
                                         <c:if test="${item.status==PaymentStatus.SENT}">
                                             <fmt:message key='payment.status.sent'/>
+                                            <form action="controller" method="post" target="_blank">
+                                                <input type="hidden" name="command" value="generateReport">
+                                                <input type="hidden" name="paymentID" value="${item.id}">
+                                                <button type="submit"><fmt:message key="label.payment.report"/></button>
+                                            </form>
                                         </c:if>
                                         <c:if test="${item.status==PaymentStatus.PREPARED}">
                                             <fmt:message key='payment.status.prep'/>

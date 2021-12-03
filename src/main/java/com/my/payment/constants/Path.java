@@ -2,6 +2,7 @@ package com.my.payment.constants;
 
 public class Path {
     public static final String LOGIN_PAGE="loginPage.jsp";
+    public static final String RECEIPT_PAGE="receipt.pdf";
     public static final String RESULT_PAGE="resultPage.jsp";
     public static final String USER_CABINET="account.jsp";
     public static final String USERS_PAGE="/WEB-INF/jsp/users.jsp";

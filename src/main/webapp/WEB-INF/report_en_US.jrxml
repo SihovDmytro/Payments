@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="paymentReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8c2f2325-c0f8-4a28-a5c6-87d9b8cc31a4">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MyDataAdapter"/>
+	<queryString language="xPath">
+		<![CDATA[/product]]>
+	</queryString>
+	<field name="amount" class="java.lang.Double">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="amount"/>
+		<fieldDescription><![CDATA[amount]]></fieldDescription>
+	</field>
+	<field name="date" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="date"/>
+		<fieldDescription><![CDATA[date]]></fieldDescription>
+	</field>
+	<field name="id" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="id"/>
+		<fieldDescription><![CDATA[id]]></fieldDescription>
+	</field>
+	<field name="status" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="status"/>
+		<fieldDescription><![CDATA[status]]></fieldDescription>
+	</field>
+	<field name="numberFrom" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="from/number"/>
+		<fieldDescription><![CDATA[from/number]]></fieldDescription>
+	</field>
+	<field name="numberTo" class="java.lang.String">
+		<property name="net.sf.jasperreports.xpath.field.expression" value="to/number"/>
+		<fieldDescription><![CDATA[to/number]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="396" splitType="Stretch">
+			<textField>
+				<reportElement x="-20" y="14" width="594" height="30" uuid="15e66c3f-fdc4-4c21-acf1-282024adc5ae"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Payment ID: "+$F{id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="120" width="480" height="30" uuid="5946d464-9871-45ca-ade4-2d5b7843ad0e"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sender: "+$F{numberFrom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="170" width="480" height="30" uuid="960cc680-24bc-4da6-a872-215f4182806d"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Receiver: "+$F{numberTo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="220" width="480" height="30" uuid="b083174b-fd57-4ef9-a8b0-23b45b97e353"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Amount: "+$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="350" width="480" height="30" uuid="3d288c08-9c88-4baf-81bc-6fb2473eaff2"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date: "+$F{date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="40" y="80" width="504" height="1" uuid="13dc0994-6dc6-4a2f-9d1d-928da02e863d">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Static Text]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="280" width="504" height="1" uuid="a4e99774-11f6-44c7-b921-0b9bd824dffb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Static Text]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>
