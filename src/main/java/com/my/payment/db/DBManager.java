@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.text.ParseException;
@@ -51,7 +52,7 @@ public class DBManager {
      */
     private DBManager() {
         try {
-            Context initContext = new InitialContext();
+            InitialContext initContext = new InitialContext();
             Context envContext = (Context) initContext.lookup("java:/comp/env");
             ds = (DataSource) envContext.lookup("jdbc/MyDB");
             LOG.trace("Data source ==> " + ds);
@@ -69,9 +70,23 @@ public class DBManager {
         Connection con = null;
         try {
             con = ds.getConnection();
-        } catch (SQLException exception) {
-            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION);
+        } catch (SQLException | NullPointerException exception) {
+            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DataSource");
+            con = getConnection2();
+        }
+        return con;
+    }
 
+    /**
+     * gets connection with database by drivermanager
+     * @return Connection
+     */
+    public Connection getConnection2() {
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/payments?user=root&password=prl");
+        } catch (SQLException exception) {
+            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DriverManager");
         }
         return con;
     }
@@ -86,6 +101,10 @@ public class DBManager {
         }
         return dbManager;
     }
+
+//    public static void setDbManager(DBManager dbManager) {
+//        DBManager.dbManager = dbManager;
+//    }
 
     /**
      * Closes connection, resultset and statement
@@ -150,6 +169,7 @@ public class DBManager {
      * @return User
      */
     public User findUser(String login) {
+
         if (login == null) return null;
         PreparedStatement ps = null;
         Connection con = null;
@@ -206,20 +226,20 @@ public class DBManager {
      */
     public boolean try2Login(String login, String password) {
         PreparedStatement ps = null;
-        Connection con = null;
+        Connection connection = null;
         ResultSet rs = null;
         try {
-            con = dbManager.getConnection();
-            ps = con.prepareStatement(TRY_TO_LOGIN);
+            connection = dbManager.getConnection();
+            ps = connection.prepareStatement(TRY_TO_LOGIN);
             ps.setString(1, login);
             ps.setString(2, password);
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException exception) {
+            System.out.println(Message.CANNOT_LOGIN);
             LOG.warn(Message.CANNOT_LOGIN);
-
         } finally {
-            close(con, ps, rs);
+            close(connection, ps, rs);
         }
         return false;
     }
@@ -388,7 +408,7 @@ public class DBManager {
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                LOG.trace("generatedKey ==> " + rs.getInt(1));
+//                LOG.trace("generatedKey ==> " + rs.getInt(1));
                 card.setCardID(rs.getInt(1));
                 if (addNewCard(card, user, con)) {
                     LOG.trace("Add card");
@@ -520,6 +540,7 @@ public class DBManager {
                 c2.setTime(rs.getDate(12));
                 Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()), rs.getInt(16));
                 Calendar paymentDate = Calendar.getInstance();
+
                 String textDate = rs.getString(17);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 java.util.Date date = sdf.parse(textDate);

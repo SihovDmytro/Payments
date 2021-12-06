@@ -34,14 +34,6 @@ public class ChangeLocaleCommand implements Command {
         request.getServletContext().setAttribute("resBundle", rb);
         LOG.trace("resBundle ==> " + rb);
 
-        String path=request.getServletContext().getRealPath("/WEB-INF/report_"+lang+".jrxml");
-        System.out.println("Report template ==> "+path);
-        if(new File(path).exists())
-            System.setProperty("reportTemplate", path);
-        else {
-            LOG.trace("Cannot find report file for this locale");
-        }
-
         session.setAttribute("resultTitle", "Success");
         session.setAttribute("resultMessage", "Language is changed");
         return Path.RESULT_PAGE;

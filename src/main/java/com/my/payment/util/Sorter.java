@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Sorter {
     private static final Comparator<Payment> SORT_PAYMENTS_BY_DATE = Comparator.comparing(Payment::getDate);
-    public static final Comparator<Card> SORT_CARDS_BY_DATE = Comparator.comparing(Card::getDate);
+
     public static void sortPaymentsByDate(List<Payment> payments,boolean rev)
     {
         if (rev)
@@ -21,11 +21,5 @@ public class Sorter {
         else
             payments.sort(SORT_PAYMENTS_BY_DATE);
     }
-    public static void sortCardsByDate(List<Card> cards,boolean rev)
-    {
-        if(rev)
-             cards.sort(SORT_CARDS_BY_DATE.reversed());
-        else
-            cards.sort(SORT_CARDS_BY_DATE);
-    }
+
 }

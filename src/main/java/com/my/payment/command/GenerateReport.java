@@ -66,6 +66,7 @@ public class GenerateReport implements Command{
             Document document = JRXmlUtils.parse(JRLoader.getLocationInputStream(pathData));
             JasperReport jasperReport = JasperCompileManager.compileReport(input);
             params.put(JRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, document);
+
             String pathPdf= System.getProperty("receipt");
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,params);
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathPdf);

@@ -5,6 +5,7 @@ import com.my.payment.db.Status;
 
 import javax.jws.soap.SOAPBinding;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * User bean
@@ -16,6 +17,20 @@ public class User implements Serializable {
     private String password;
     private String email;
     private Status status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return userID == user.userID && login.equals(user.login) && role == user.role && password.equals(user.password) && email.equals(user.email) && status == user.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userID, login, role, password, email, status);
+    }
+
     @Override
     public String toString() {
         return "User{" +

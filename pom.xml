@@ -19,6 +19,8 @@
 
     <dependencies>
 
+
+
         <!-- https://mvnrepository.com/artifact/xalan/xalan -->
         <dependency>
             <groupId>xalan</groupId>
@@ -80,15 +82,31 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.1</version>
             </plugin>
         </plugins>
+        <testResources>
+
+            <!-- don't forget to specify the default test resources directory -->
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+
+        </testResources>
     </build>
 </project>

@@ -25,7 +25,7 @@ public class ContextListener implements ServletContextListener {
         System.setProperty("reportDataFile", path);
         System.out.println("Report data ==> "+path);
 
-        path=servletContext.getRealPath("/WEB-INF/report_en_US.jrxml");
+        path=servletContext.getRealPath("/WEB-INF/classes/report/report.jrxml");
         System.setProperty("reportTemplate", path);
         System.out.println("Report template ==> "+path);
 
