@@ -2,7 +2,6 @@ package com.my.payment.db.entity;
 
 import com.my.payment.db.PaymentStatus;
 import com.my.payment.util.DateAdapter;
-
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;

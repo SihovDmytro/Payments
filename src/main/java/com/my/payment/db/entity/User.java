@@ -2,8 +2,6 @@ package com.my.payment.db.entity;
 
 import com.my.payment.db.Role;
 import com.my.payment.db.Status;
-
-import javax.jws.soap.SOAPBinding;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -13,6 +13,13 @@ import java.io.*;
 public class Serializor {
     private static final Logger LOG = LogManager.getLogger(Serializor.class);
 
+    /**
+     * Serializes payment class to file
+     * @param path path to file
+     * @param payment
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     */
     public static void serializeToXml(String path, Payment payment) throws JAXBException, FileNotFoundException {
             JAXBContext context = JAXBContext.newInstance(payment.getClass());
             Marshaller marshaller = null;

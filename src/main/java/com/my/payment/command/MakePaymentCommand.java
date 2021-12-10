@@ -92,7 +92,7 @@ public class MakePaymentCommand implements Command {
 
                     LOG.trace("Transaction complete ");
                     session.setAttribute("resultTitle", "Success");
-                    session.setAttribute("resultMessage", Message.TRANSACTION_SUCCESS);
+                    session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
                     forward = Path.RESULT_PAGE;
                 } else {
                     LOG.warn("Payment error");

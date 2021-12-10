@@ -1,7 +1,5 @@
 package com.my.payment.db;
 
-import com.my.payment.db.entity.User;
-
 public enum Role {
     USER(1), ADMIN(2);
     private final int id;

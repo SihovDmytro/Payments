@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -66,7 +67,8 @@ public class GenerateReport implements Command{
             Document document = JRXmlUtils.parse(JRLoader.getLocationInputStream(pathData));
             JasperReport jasperReport = JasperCompileManager.compileReport(input);
             params.put(JRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, document);
-
+            Locale locale = new Locale( "en", "US" );
+            params.put( JRParameter.REPORT_LOCALE, locale );
             String pathPdf= System.getProperty("receipt");
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,params);
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathPdf);

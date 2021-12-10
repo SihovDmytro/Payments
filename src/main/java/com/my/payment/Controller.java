@@ -60,7 +60,7 @@ public class Controller extends HttpServlet {
             response.sendRedirect(forward);
         }else {
             logger.trace("Forward ==> " + forward);
-            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(forward);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
             dispatcher.forward(request, response);
         }
     }

@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.text.ParseException;
@@ -72,7 +71,7 @@ public class DBManager {
             con = ds.getConnection();
         } catch (SQLException | NullPointerException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DataSource");
-            con = getConnection2();
+//            con = getConnection2();
         }
         return con;
     }
@@ -81,15 +80,15 @@ public class DBManager {
      * gets connection with database by drivermanager
      * @return Connection
      */
-    public Connection getConnection2() {
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/payments?user=root&password=prl");
-        } catch (SQLException exception) {
-            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DriverManager");
-        }
-        return con;
-    }
+//    public Connection getConnection2() {
+//        Connection con = null;
+//        try {
+//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/payments?user=root&password=prl");
+//        } catch (SQLException exception) {
+//            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DriverManager");
+//        }
+//        return con;
+//    }
 
     /**
      * Singleton
@@ -236,7 +235,6 @@ public class DBManager {
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException exception) {
-            System.out.println(Message.CANNOT_LOGIN);
             LOG.warn(Message.CANNOT_LOGIN);
         } finally {
             close(connection, ps, rs);
