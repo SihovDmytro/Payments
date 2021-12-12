@@ -1,5 +1,6 @@
 package com.my.payment.command;
 
+import com.my.payment.constants.MailType;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
@@ -42,7 +43,7 @@ public class RegistrationCommand implements Command {
         logger.trace("Request parameter pass ==> " + pass);
         String passR = request.getParameter("pass-repeat");
         logger.trace("Request parameter pass-repeat ==> " + passR);
-        String forward = Path.ERROR_PAGE;
+        String forward = Path.REGISTRATION_PAGE;
         HttpSession session = request.getSession();
         if (!checkEmail(email)) {
             logger.warn(Message.INVALID_EMAIL);
@@ -83,11 +84,16 @@ public class RegistrationCommand implements Command {
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);
                 session.setAttribute("isSuccess", rb.getString("message.userCreate"));
+                session.setAttribute("newUser",user);
+                forward = Path.SEND_MAIL_COMMAND;
             } else {
                 session.setAttribute("isSuccess", rb.getString("message.cannotCreateUser"));
             }
-        } else logger.warn(Message.CANNOT_CREATE_USER);
-        forward = Path.REGISTRATION_PAGE;
+        } else {
+            logger.warn(Message.CANNOT_CREATE_USER);
+        }
+        session.setAttribute("mailType", MailType.REGISTRATION);
+
         return forward;
     }
 

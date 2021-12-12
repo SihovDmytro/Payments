@@ -1,6 +1,5 @@
 package com.my.payment.command;
 
-import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,7 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -18,8 +16,8 @@ import java.util.ResourceBundle;
  * Change locale command
  * @author Sihov Dmytro
  */
-public class ChangeLocaleCommand implements Command {
-    private static final Logger LOG = LogManager.getLogger(ChangeLocaleCommand.class);
+public class ChangeLanguageCommand implements Command {
+    private static final Logger LOG = LogManager.getLogger(ChangeLanguageCommand.class);
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -34,8 +32,8 @@ public class ChangeLocaleCommand implements Command {
         request.getServletContext().setAttribute("resBundle", rb);
         LOG.trace("resBundle ==> " + rb);
 
-        session.setAttribute("resultTitle", "Success");
-        session.setAttribute("resultMessage", "Language is changed");
+        session.setAttribute("resultTitle", rb.getString("message.success"));
+        session.setAttribute("resultMessage", rb.getString("message.langChange"));
         return Path.RESULT_PAGE;
     }
 }

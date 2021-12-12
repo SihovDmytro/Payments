@@ -18,4 +18,5 @@ public class Path {
     public static final String GET_CARDS_COMMAND="controller?command=getCards";
     public static final String GET_CABINET_COMMAND="controller?command=getUserInfo";
     public static final String GET_CARD_INFO_COMMAND="controller?command=getPayments";
+    public static final String SEND_MAIL_COMMAND="controller?command=sendMail";
 }

@@ -27,13 +27,13 @@ public class CommandContainer {
         commands.put("commitPayment", new CommitPaymentCommand());
         commands.put("changeCardStatus", new ChangeCardStatusCommand());
         commands.put("topUp", new TopUpCommand());
-        commands.put("changeLocale", new ChangeLocaleCommand());
+        commands.put("changeLocale", new ChangeLanguageCommand());
         commands.put("getUsers", new GetUsersCommand());
         commands.put("changeUserStatus", new ChangeUserStatusCommand());
         commands.put("cancelPayment", new CancelPaymentCommand());
         commands.put("changeCardName", new ChangeCardNameCommand());
         commands.put("generateReport", new GenerateReport());
-
+        commands.put("sendMail", new SendEmailCommand());
     }
 
     public static Command get(String commandName) {

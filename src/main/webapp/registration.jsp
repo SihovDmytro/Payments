@@ -67,6 +67,8 @@
 		<c:remove var="passVal" scope="session"/>
 		<c:remove var="loginVal" scope="session"/>
 		<c:remove var="emailVal" scope="session"/>
+			<c:remove var="newUser" scope="session"/>
+			<c:remove var="mailType" scope="session"/>
 		</td>
 	</tr>
 </table>

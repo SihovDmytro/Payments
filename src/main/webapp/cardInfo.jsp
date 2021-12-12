@@ -1,3 +1,4 @@
+
 <%@include file="/WEB-INF/jspf/page.jspf"%>
 <%@include file="/WEB-INF/jspf/tags.jspf"%>
 <%@ page import="com.my.payment.db.PaymentStatus" %>
@@ -121,6 +122,7 @@
                                                 <button type="submit"><fmt:message key='payment.cancel'/></button>
                                             </form>
                                         </c:if>
+
                                     </td>
                                 </tr>
                             </c:if>

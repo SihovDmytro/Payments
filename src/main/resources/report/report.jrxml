@@ -5,7 +5,7 @@
 	<queryString language="xPath">
 		<![CDATA[/product]]>
 	</queryString>
-	<field name="amount" class="java.lang.Double">
+	<field name="amount" class="java.lang.String">
 		<property name="net.sf.jasperreports.xpath.field.expression" value="amount"/>
 		<fieldDescription><![CDATA[amount]]></fieldDescription>
 	</field>
