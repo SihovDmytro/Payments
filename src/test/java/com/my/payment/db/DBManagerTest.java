@@ -355,20 +355,26 @@ class DBManagerTest {
     @Test
     public void makePayment() throws SQLException {
         when(dbM.makePayment(any())).thenCallRealMethod();
+        when(con.prepareStatement(anyString(),anyInt())).thenReturn(ps);
+        when(ps.getGeneratedKeys()).thenReturn(rs);
+        when(rs.getInt(1)).thenReturn(1);
+        when(rs.next()).thenReturn(true);
         doNothing().when(con).commit();
         when(ps.executeUpdate()).thenReturn(1);
 
         Card card1 = new Card("название", "1999567899876543", Calendar.getInstance(), 1, 1000, Status.ACTIVE, 123);
         Card card2 = new Card("название2", "1111222233334444", Calendar.getInstance(), 1234, 123, Status.ACTIVE, 321);
         Payment payment = new Payment(card1, card2, Calendar.getInstance(), 100.50, PaymentStatus.PREPARED);
-        boolean check = dbM.makePayment(payment);
-        assertTrue(check);
+        int result = dbM.makePayment(payment);
+        assertEquals(result,1);
 
         verify(dbM, times(1)).getConnection();
         verify(con, times(1)).setAutoCommit(false);
-        verify(con, times(3)).prepareStatement(anyString());
+        verify(con, times(2)).prepareStatement(anyString());
+        verify(con, times(1)).prepareStatement(anyString(),anyInt());
         verify(con, times(1)).setAutoCommit(false);
         verify(ps, times(3)).executeUpdate();
+        verify(rs,times(1)).next();
         verify(ps, times(3)).setDouble(anyInt(), anyDouble());
         verify(ps, times(4)).setInt(anyInt(), anyInt());
         verify(ps, times(1)).setTimestamp(anyInt(), any());

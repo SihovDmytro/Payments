@@ -18,9 +18,6 @@
     </properties>
 
     <dependencies>
-
-
-
         <!-- https://mvnrepository.com/artifact/xalan/xalan -->
         <dependency>
             <groupId>xalan</groupId>
@@ -108,11 +105,9 @@
             </plugin>
         </plugins>
         <testResources>
-
             <testResource>
                 <directory>src/test/resources</directory>
             </testResource>
-
         </testResources>
     </build>
 </project>

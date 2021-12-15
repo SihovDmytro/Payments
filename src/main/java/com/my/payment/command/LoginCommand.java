@@ -7,22 +7,17 @@ import com.my.payment.db.entity.User;
 import com.my.payment.util.PasswordHash;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
  * Login command
+ *
  * @author Sihov Dmytro
  */
 public class LoginCommand implements Command {

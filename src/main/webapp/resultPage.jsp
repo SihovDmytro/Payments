@@ -22,6 +22,8 @@
             </c:if>
             <c:remove var="resultMessage" scope="session"/>
             <c:remove var="resultTitle" scope="session"/>
+            <c:remove var="mailType" scope="session"/>
+            <c:remove var="paymentID" scope="session"/>
         </td>
     </tr>
 

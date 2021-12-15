@@ -1,5 +1,6 @@
 package com.my.payment.command;
 
+import com.my.payment.constants.MailType;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.entity.Payment;
@@ -31,18 +32,22 @@ public class GenerateReport implements Command{
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        LOG.debug("MakePaymentCommand starts");
+        LOG.debug("GenerateReport starts");
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         HttpSession session = request.getSession();
         String forward = Path.ERROR_PAGE;
         int paymentID;
-        try {
-            LOG.trace("paymentID parameter ==> " + request.getParameter("paymentID"));
-            paymentID = Integer.parseInt(request.getParameter("paymentID"));
-        } catch (NumberFormatException exception) {
-            LOG.warn("Cannot parse paymentID");
-            session.setAttribute("ErrorMessage", "Cannot generate report");
-            return forward;
+        if((MailType)request.getAttribute("mailType") == MailType.PAYMENT)
+        {
+            paymentID = (int)request.getAttribute("paymentID");
+        }else{
+            try {
+                LOG.trace("paymentID parameter ==> " + request.getParameter("paymentID"));
+                paymentID = Integer.parseInt(request.getParameter("paymentID"));
+            } catch (NumberFormatException exception) {
+                LOG.warn("Cannot parse paymentID");
+                throw new ServletException();
+            }
         }
 
         DBManager dbManager = DBManager.getInstance();
@@ -56,6 +61,7 @@ public class GenerateReport implements Command{
         String pathData = System.getProperty("reportDataFile");
         try {
             Serializor.serializeToXml(pathData, payment);
+            LOG.trace("Serialization complete");
         }catch (JAXBException e){
             LOG.trace("Cannot serialize to xml");
         }
@@ -67,15 +73,14 @@ public class GenerateReport implements Command{
             Document document = JRXmlUtils.parse(JRLoader.getLocationInputStream(pathData));
             JasperReport jasperReport = JasperCompileManager.compileReport(input);
             params.put(JRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, document);
-//            Locale locale = new Locale( "en", "US" );
-//            params.put( JRParameter.REPORT_LOCALE, locale );
             String pathPdf= System.getProperty("receipt");
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,params);
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathPdf);
             forward=Path.RECEIPT_PAGE;
+
         } catch (JRException e) {
             LOG.trace("Cannot generate report");
-            e.printStackTrace();
+
         }
         return forward;
     }

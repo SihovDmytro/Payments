@@ -7,13 +7,18 @@ import com.my.payment.filters.AccessFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -24,13 +29,19 @@ public class SendEmailCommand implements Command {
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        LOG.trace("SendEmailCommand starts");
-        String redirect = Path.REGISTRATION_PAGE;
+        LOG.trace("SendEmail starts");
+        String redirect=Path.RESULT_PAGE;
+
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("newUser");
+        User user = null;
+        MailType type = (MailType) request.getAttribute("mailType");
+        LOG.trace("MailType ==> "+type);
+        if(type==MailType.REGISTRATION)
+            user = (User) request.getAttribute("currUser");
+        else
+            user= (User) session.getAttribute("currUser");
         LOG.trace("user ==> " + user);
-        MailType type = (MailType) session.getAttribute("mailType");
         try (InputStream input = LoginCommand.class.getClassLoader().getResourceAsStream("mail.properties")) {
             Properties props = new Properties();
             props.load(SendEmailCommand.class.getClassLoader().getResourceAsStream("mail.properties"));
@@ -41,6 +52,7 @@ public class SendEmailCommand implements Command {
                     return new PasswordAuthentication(props.getProperty("mail.from"), props.getProperty("mail.from.password"));
                 }
             });
+
             LOG.trace("mailSession ==> " + mailSession);
             MimeMessage message = new MimeMessage(mailSession);
             message.setFrom(new InternetAddress(props.getProperty("mail.from")));
@@ -53,9 +65,26 @@ public class SendEmailCommand implements Command {
                 LOG.trace("message ==> " + message);
                 Transport.send(message);
             }
+            else if(type == MailType.PAYMENT)
+            {
+                new GenerateReport().execute(request,response);
+                message.setSubject(rb.getString("message.transactionSuccess"));
+                MimeBodyPart bodyPart = new MimeBodyPart();
+                String filename = System.getProperty("receipt");
+                FileDataSource source = new FileDataSource(filename);
+                bodyPart.setDataHandler(new DataHandler(source));
+                bodyPart.setFileName(filename);
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(bodyPart);
+                message.setContent(multipart);
+                Transport.send(message);
+                LOG.trace("Email is sent");
+            }
 
         } catch (MessagingException ex) {
-            LOG.trace("Cannot send email. "+ex.getMessage());
+            LOG.trace("Cannot send email");
+            ex.printStackTrace();
+
         }
         return redirect;
     }

@@ -1,5 +1,6 @@
 package com.my.payment.command;
 
+import com.my.payment.constants.MailType;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
@@ -58,6 +59,13 @@ public class CommitPaymentCommand implements Command {
             LOG.trace("Transaction complete ");
             session.setAttribute("resultTitle", rb.getString("message.success"));
             session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
+            request.setAttribute("mailType", MailType.PAYMENT);
+            request.setAttribute("paymentID",payment.getId());
+            try {
+                new SendEmailCommand().execute(request,response);
+            }catch (IOException | ServletException exception){
+                LOG.trace("Cannot send email");
+            }
             forward = Path.RESULT_PAGE;
         } else {
             LOG.warn("Payment error");

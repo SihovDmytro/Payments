@@ -653,16 +653,17 @@ public class DBManager {
     /**
      * Makes transaction
      * @param payment
-     * @return
+     * @return payment id
      */
-    public boolean makePayment(Payment payment) {
+    public int makePayment(Payment payment) {
         PreparedStatement ps = null;
         Connection con = null;
-        boolean result = false;
+        ResultSet rs = null;
+        int result = 0;
         try {
             con = dbManager.getConnection();
             con.setAutoCommit(false);
-            ps = con.prepareStatement(MAKE_PAYMENT);
+            ps = con.prepareStatement(MAKE_PAYMENT,Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, payment.getFrom().getCardID());
             ps.setInt(2, payment.getTo().getCardID());
             Calendar c = payment.getDate();
@@ -674,8 +675,11 @@ public class DBManager {
             if (ps.executeUpdate() > 0) {
                 withdraw(payment.getFrom().getCardID(), payment.getAmount(), con);
                 transfer(payment.getTo().getCardID(), payment.getAmount(), con);
+                rs = ps.getGeneratedKeys();
+                if(rs.next()){
+                    result = rs.getInt(1);
+                }
                 con.commit();
-                result = true;
             } else {
                 throw new SQLException();
             }
@@ -690,8 +694,8 @@ public class DBManager {
                 }
             }
         } finally {
-            close(con);
-            close(ps);
+            close(con,ps,rs);
+
         }
         return result;
     }

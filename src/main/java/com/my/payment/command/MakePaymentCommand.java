@@ -1,5 +1,6 @@
 package com.my.payment.command;
 
+import com.my.payment.constants.MailType;
 import com.my.payment.constants.Message;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
@@ -88,12 +89,22 @@ public class MakePaymentCommand implements Command {
             Payment payment = new Payment(card, dbManager.getCardByNumber(numberTo), Calendar.getInstance(), amount, ps);
             LOG.trace("Formed payment ==> " + payment);
             if (ps == PaymentStatus.SENT) {
-                if (dbManager.makePayment(payment)) {
+                int newPaymentID=dbManager.makePayment(payment);
+                LOG.trace("newPaymentID ==> "+newPaymentID);
+                if (newPaymentID!=0) {
 
                     LOG.trace("Transaction complete ");
                     session.setAttribute("resultTitle", "Success");
                     session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
-                    forward = Path.RESULT_PAGE;
+                    request.setAttribute("mailType", MailType.PAYMENT);
+                    request.setAttribute("paymentID", newPaymentID);
+                    try {
+                        new SendEmailCommand().execute(request,response);
+                    }catch (IOException | ServletException exception){
+                        LOG.trace("Cannot send email");
+                    }
+                    forward=Path.RESULT_PAGE;
+
                 } else {
                     LOG.warn("Payment error");
                     session.setAttribute("ErrorMessage", rb.getString("message.cannotMakePayment"));

@@ -24,62 +24,54 @@ public class Controller extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(Controller.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        process(req,resp);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        processPost(req,resp);
-    }
-
-    /**
-     * Gets command from CommandContainer and executes it
-     * @param request
-     * @param response
-     * @throws IOException
-     * @throws ServletException
-     */
-    private void process(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String commandName = request.getParameter("command");
+        String commandName = req.getParameter("command");
 
         logger.trace("Parameter command ==>"+commandName);
         Command command = CommandContainer.get(commandName);
-        HttpSession session = request.getSession();
+        HttpSession session = req.getSession();
         logger.trace("Obtained command ==>"+commandName);
         String forward = Path.ERROR_PAGE;
-        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+        ResourceBundle rb = (ResourceBundle) req.getServletContext().getAttribute("resBundle");
         logger.trace("resBundle ==> "+rb);
         try {
-            forward = command.execute(request, response);
+            forward = command.execute(req, resp);
         } catch (Exception ex) {
             logger.warn("Execute exception ==>"+ex);
             session.setAttribute("ErrorMessage", rb.getString("message.unknownErr"));
         }
-        if (forward.equals("resultPage.jsp"))
-        {
-            response.sendRedirect(forward);
-        }else {
-            logger.trace("Forward ==> " + forward);
-            RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
-            dispatcher.forward(request, response);
-        }
+
+        logger.trace("Forward ==> " + forward);
+        RequestDispatcher dispatcher = req.getRequestDispatcher(forward);
+        dispatcher.forward(req, resp);
+
     }
-    private void processPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String commandName = request.getParameter("command");
-        HttpSession session = request.getSession();
-        ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String commandName = req.getParameter("command");
+        HttpSession session = req.getSession();
+        ResourceBundle rb = (ResourceBundle) req.getServletContext().getAttribute("resBundle");
         logger.trace("resBundle ==> "+rb);
         logger.trace("Parameter command ==>"+commandName);
         Command command = CommandContainer.get(commandName);
         logger.trace("Obtained command ==>"+commandName);
         String redirect = Path.ERROR_PAGE;
         try {
-            redirect = command.execute(request, response);
+            redirect = command.execute(req, resp);
         } catch (Exception ex) {
             logger.warn("Execute exception ==>"+ex);
             session.setAttribute("ErrorMessage", rb.getString("message.unknownErr"));
         }
-        logger.trace("Redirect ==> " + redirect);
-        response.sendRedirect(redirect);
+
+        if(commandName.equals("sendMail"))
+        {
+            logger.trace("forward ==> " + redirect);
+            RequestDispatcher dispatcher = req.getRequestDispatcher(redirect);
+            dispatcher.forward(req, resp);
+        }else {
+            logger.trace("Redirect ==> " + redirect);
+            resp.sendRedirect(redirect);
+        }
+
     }
 }

@@ -63,7 +63,7 @@ class RegistrationCommandTest {
         dbManagerStatic.verify(DBManager::getInstance, times(1));
         verify(dbManager, times(1)).addUser(any());
         verify(dbManager, times(1)).findUser(anyString());
-        verify(session, times(1)).setAttribute(anyString(), any());
+        verify(session, times(3)).setAttribute(anyString(), any());
 
         dbManagerStatic.close();
     }

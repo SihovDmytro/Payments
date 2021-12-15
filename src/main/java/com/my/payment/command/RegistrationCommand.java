@@ -84,16 +84,19 @@ public class RegistrationCommand implements Command {
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);
                 session.setAttribute("isSuccess", rb.getString("message.userCreate"));
-                session.setAttribute("newUser",user);
-                forward = Path.SEND_MAIL_COMMAND;
+                request.setAttribute("currUser",user);
+                request.setAttribute("mailType", MailType.REGISTRATION);
+                try {
+                    new SendEmailCommand().execute(request, response);
+                }catch (IOException | ServletException exception){
+                    logger.trace("Cannot send email");
+                }
             } else {
                 session.setAttribute("isSuccess", rb.getString("message.cannotCreateUser"));
             }
         } else {
             logger.warn(Message.CANNOT_CREATE_USER);
         }
-        session.setAttribute("mailType", MailType.REGISTRATION);
-
         return forward;
     }
 
