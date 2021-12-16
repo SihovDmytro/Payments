@@ -56,15 +56,15 @@ class RegistrationCommandTest {
 
         new RegistrationCommand().execute(request, response);
 
-        verify(request, times(1)).getSession();
-        verify(request, times(1)).getServletContext();
-        verify(context, times(1)).getAttribute(anyString());
+        verify(request, times(2)).getSession();
+        verify(request, times(2)).getServletContext();
+        verify(context, times(2)).getAttribute(anyString());
         verify(request, times(4)).getParameter(anyString());
         dbManagerStatic.verify(DBManager::getInstance, times(1));
         verify(dbManager, times(1)).addUser(any());
         verify(dbManager, times(1)).findUser(anyString());
-        verify(session, times(3)).setAttribute(anyString(), any());
-
+        verify(session, times(1)).setAttribute(anyString(), any());
+        verify(request, times(2)).setAttribute(anyString(), any());
         dbManagerStatic.close();
     }
 }

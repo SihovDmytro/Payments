@@ -88,7 +88,7 @@ public class RegistrationCommand implements Command {
                 request.setAttribute("mailType", MailType.REGISTRATION);
                 try {
                     new SendEmailCommand().execute(request, response);
-                }catch (IOException | ServletException exception){
+                }catch (Exception exception){
                     logger.trace("Cannot send email");
                 }
             } else {
