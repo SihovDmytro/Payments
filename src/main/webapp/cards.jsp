@@ -87,6 +87,29 @@
                     <a href="${Path.NEW_CARD_PAGE}"><fmt:message key='card.add'/></a><br>
                     <a href="${Path.CREATE_CARD_PAGE}"><fmt:message key='card.create'/></a>
                 </c:if>
+                <c:if test="${sessionScope.userRole==Role.USER}">
+                    <hr>
+                    <table id = "mydatatable2" class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th><fmt:message key='header.from'/></th>
+                            <th><fmt:message key='header.to'/></th>
+                            <th><fmt:message key='card.amount'/></th>
+                            <th><fmt:message key='header.date'/></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach var="item" items="${requestScope.allPayments}">
+                            <tr>
+                                <td>${item.from.number}</td>
+                                <td>${item.to.number}</td>
+                                <td>${item.amount}</td>
+                                <td>${item.textDateTime}</td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
             </td>
         </tr>
     </table>

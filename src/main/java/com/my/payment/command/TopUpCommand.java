@@ -1,6 +1,7 @@
 package com.my.payment.command;
 
 import com.my.payment.constants.Message;
+import com.my.payment.constants.NumericConstants;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Status;
@@ -69,6 +70,6 @@ public class TopUpCommand implements Command {
     }
 
     private boolean checkAmount(double amount, Card card) {
-        return !(card.getBalance() + amount > 999999999);
+        return !(card.getBalance() + amount > NumericConstants.MAX_AMOUNT);
     }
 }

@@ -6,6 +6,7 @@ import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -41,8 +42,10 @@ public class DBManager {
     private static final String CHANGE_USER_STATUS = "UPDATE user SET status = ? WHERE id=?";
     private static final String GET_PAYMENT_BY_ID = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE p.id=?";
     private static final String COMMIT_PAYMENT = "UPDATE payment SET status='sent', date=current_timestamp()  WHERE id=?";
-    private static final String CANCEL_PAYMENT="DELETE FROM payment WHERE (id = ?)";
-    private static final String CHANGE_CARD_NAME="UPDATE card SET name=? WHERE id=?";
+    private static final String CANCEL_PAYMENT = "DELETE FROM payment WHERE (id = ?)";
+    private static final String CHANGE_CARD_NAME = "UPDATE card SET name=? WHERE id=?";
+
+    private static final String GET_SENT_PAYMENTS_OUT = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c2.id=? AND p.status='sent' ORDER BY p.date DESC";
     private static DBManager dbManager;
     private DataSource ds;
 
@@ -63,14 +66,15 @@ public class DBManager {
 
     /**
      * gets connection with database
+     *
      * @return Connection
-    */
+     */
     public Connection getConnection() {
         Connection con = null;
         try {
             con = ds.getConnection();
         } catch (SQLException | NullPointerException exception) {
-            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION+" from DataSource");
+            LOG.warn(Message.CANNOT_OBTAIN_CONNECTION + " from DataSource");
 //            con = getConnection2();
         }
         return con;
@@ -92,6 +96,7 @@ public class DBManager {
 
     /**
      * Singleton
+     *
      * @return instance of DBManager
      */
     public static synchronized DBManager getInstance() {
@@ -101,15 +106,12 @@ public class DBManager {
         return dbManager;
     }
 
-//    public static void setDbManager(DBManager dbManager) {
-//        DBManager.dbManager = dbManager;
-//    }
-
     /**
      * Closes connection, resultset and statement
-     * @param con Connection
+     *
+     * @param con       Connection
      * @param statement Statement
-     * @param rs ResultSet
+     * @param rs        ResultSet
      */
     private void close(Connection con, Statement statement, ResultSet rs) {
         close(rs);
@@ -119,6 +121,7 @@ public class DBManager {
 
     /**
      * Closes ResultSet
+     *
      * @param rs ResultSet
      */
     private void close(ResultSet rs) {
@@ -134,6 +137,7 @@ public class DBManager {
 
     /**
      * Closes Statement
+     *
      * @param st Statement
      */
     private void close(Statement st) {
@@ -149,6 +153,7 @@ public class DBManager {
 
     /**
      * Closes connection
+     *
      * @param con Connection
      */
     private void close(Connection con) {
@@ -164,6 +169,7 @@ public class DBManager {
 
     /**
      * Selects user by login
+     *
      * @param login user login
      * @return User
      */
@@ -174,7 +180,7 @@ public class DBManager {
         Connection con = null;
         ResultSet rs = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(FIND_USER);
             ps.setString(1, login);
             rs = ps.executeQuery();
@@ -191,6 +197,7 @@ public class DBManager {
 
     /**
      * Inserts a new user
+     *
      * @param user User object
      * @return result
      */
@@ -198,7 +205,7 @@ public class DBManager {
         PreparedStatement ps = null;
         Connection con = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(ADD_USER);
             ps.setString(1, user.getLogin());
             ps.setInt(2, user.getRole().getId());
@@ -219,6 +226,7 @@ public class DBManager {
 
     /**
      * Trying to login
+     *
      * @param login
      * @param password
      * @return result
@@ -228,7 +236,7 @@ public class DBManager {
         Connection connection = null;
         ResultSet rs = null;
         try {
-            connection = dbManager.getConnection();
+            connection = getConnection();
             ps = connection.prepareStatement(TRY_TO_LOGIN);
             ps.setString(1, login);
             ps.setString(2, password);
@@ -244,6 +252,7 @@ public class DBManager {
 
     /**
      * Selects all cards for user
+     *
      * @param user User object
      * @return User objects list
      */
@@ -253,7 +262,7 @@ public class DBManager {
         ResultSet rs = null;
         List<Card> cards = new ArrayList<>();
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_CARDS_FOR_USER);
             ps.setInt(1, user.getUserID());
             rs = ps.executeQuery();
@@ -274,6 +283,7 @@ public class DBManager {
 
     /**
      * Selects all cards
+     *
      * @return Card objects list
      */
     public List<Card> getAllCards() {
@@ -282,7 +292,7 @@ public class DBManager {
         ResultSet rs = null;
         List<Card> cards = new ArrayList<>();
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             s = con.createStatement();
             rs = s.executeQuery(GET_ALL_CARDS);
             while (rs.next()) {
@@ -302,6 +312,7 @@ public class DBManager {
 
     /**
      * Inserts card for user
+     *
      * @param card
      * @param user
      * @return operation result
@@ -311,7 +322,7 @@ public class DBManager {
         Connection con = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(ADD_CARD);
             ps.setInt(1, user.getUserID());
             ps.setInt(2, card.getCardID());
@@ -330,6 +341,7 @@ public class DBManager {
 
     /**
      * Inserts a new card
+     *
      * @param card
      * @param user
      * @param con
@@ -357,6 +369,7 @@ public class DBManager {
 
     /**
      * Selects card by id
+     *
      * @param id card id
      * @return Card object
      */
@@ -366,7 +379,7 @@ public class DBManager {
         ResultSet rs = null;
         Card card = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_CARD_BY_ID);
             ps.setInt(1, id);
             rs = ps.executeQuery();
@@ -386,6 +399,7 @@ public class DBManager {
 
     /**
      * Inserts a new card
+     *
      * @param card
      * @param user
      * @return operation result
@@ -396,7 +410,7 @@ public class DBManager {
         ResultSet rs = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             con.setAutoCommit(false);
             ps = con.prepareStatement(CREATE_NEW_CARD, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, card.getName());
@@ -431,6 +445,7 @@ public class DBManager {
 
     /**
      * Checks if user already have this card
+     *
      * @param card
      * @param user
      * @return operation result
@@ -441,7 +456,7 @@ public class DBManager {
         ResultSet rs = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_CARD_FOR_USER);
             ps.setInt(1, user.getUserID());
             ps.setInt(2, card.getCardID());
@@ -461,6 +476,7 @@ public class DBManager {
 
     /**
      * Selects payments for card
+     *
      * @param card
      * @return Payments objects list
      */
@@ -470,7 +486,7 @@ public class DBManager {
         ResultSet rs = null;
         List<Payment> payments = new ArrayList<>();
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_PAYMENTS_IN);
             ps.setInt(1, card.getCardID());
             rs = ps.executeQuery();
@@ -517,6 +533,7 @@ public class DBManager {
 
     /**
      * Selects payment by id
+     *
      * @param id
      * @return Payment object
      */
@@ -526,7 +543,7 @@ public class DBManager {
         ResultSet rs = null;
         Payment payment = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_PAYMENT_BY_ID);
             ps.setInt(1, id);
             rs = ps.executeQuery();
@@ -556,6 +573,7 @@ public class DBManager {
 
     /**
      * Selects card by number
+     *
      * @param number card number
      * @return Card object
      */
@@ -565,7 +583,7 @@ public class DBManager {
         ResultSet rs = null;
         Card cardFrom = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(GET_CARD_BY_NUMBER);
             ps.setString(1, number);
             rs = ps.executeQuery();
@@ -584,6 +602,7 @@ public class DBManager {
 
     /**
      * Confirms payment and makes transaction
+     *
      * @param payment
      * @return operation result
      */
@@ -592,7 +611,7 @@ public class DBManager {
         Connection con = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             con.setAutoCommit(false);
             ps = con.prepareStatement(COMMIT_PAYMENT);
             ps.setInt(1, payment.getId());
@@ -621,6 +640,7 @@ public class DBManager {
 
     /**
      * Prepares payment
+     *
      * @param payment
      * @return operation result
      */
@@ -629,7 +649,7 @@ public class DBManager {
         Connection con = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(MAKE_PAYMENT);
             ps.setInt(1, payment.getFrom().getCardID());
             ps.setInt(2, payment.getTo().getCardID());
@@ -652,6 +672,7 @@ public class DBManager {
 
     /**
      * Makes transaction
+     *
      * @param payment
      * @return payment id
      */
@@ -661,9 +682,9 @@ public class DBManager {
         ResultSet rs = null;
         int result = 0;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             con.setAutoCommit(false);
-            ps = con.prepareStatement(MAKE_PAYMENT,Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement(MAKE_PAYMENT, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, payment.getFrom().getCardID());
             ps.setInt(2, payment.getTo().getCardID());
             Calendar c = payment.getDate();
@@ -676,7 +697,7 @@ public class DBManager {
                 withdraw(payment.getFrom().getCardID(), payment.getAmount(), con);
                 transfer(payment.getTo().getCardID(), payment.getAmount(), con);
                 rs = ps.getGeneratedKeys();
-                if(rs.next()){
+                if (rs.next()) {
                     result = rs.getInt(1);
                 }
                 con.commit();
@@ -694,7 +715,7 @@ public class DBManager {
                 }
             }
         } finally {
-            close(con,ps,rs);
+            close(con, ps, rs);
 
         }
         return result;
@@ -702,9 +723,10 @@ public class DBManager {
 
     /**
      * Withdraws money from card
-     * @param id card id
+     *
+     * @param id     card id
      * @param amount
-     * @param con Connection
+     * @param con    Connection
      * @throws SQLException
      */
     private void withdraw(int id, double amount, Connection con) throws SQLException {
@@ -721,9 +743,10 @@ public class DBManager {
 
     /**
      * Transfers money to card
-     * @param id card id
+     *
+     * @param id     card id
      * @param amount
-     * @param con Connection
+     * @param con    Connection
      * @return operation result
      * @throws SQLException
      */
@@ -744,7 +767,8 @@ public class DBManager {
 
     /**
      * Updates card status
-     * @param id card id
+     *
+     * @param id     card id
      * @param status new status
      * @return operation result
      */
@@ -753,7 +777,7 @@ public class DBManager {
         PreparedStatement ps = null;
         Connection con = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(CHANGE_CARD_STATUS);
             ps.setString(1, status.toString().toLowerCase());
             ps.setInt(2, id);
@@ -773,7 +797,8 @@ public class DBManager {
 
     /**
      * Replenish the card
-     * @param c card object
+     *
+     * @param c      card object
      * @param amount
      * @return operation result
      */
@@ -781,7 +806,7 @@ public class DBManager {
         boolean result = false;
         Connection con = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             result = transfer(c.getCardID(), amount, con);
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_TOP_UP);
@@ -793,6 +818,7 @@ public class DBManager {
 
     /**
      * Selects all users
+     *
      * @return users objects list
      */
     public List<User> getAllUsers() {
@@ -801,7 +827,7 @@ public class DBManager {
         ResultSet rs = null;
         List<User> users = new ArrayList<>();
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             s = con.createStatement();
             rs = s.executeQuery(GET_USERS);
             while (rs.next()) {
@@ -817,7 +843,8 @@ public class DBManager {
 
     /**
      * Updates user status
-     * @param id user id
+     *
+     * @param id     user id
      * @param status new status
      * @return operation result
      */
@@ -826,7 +853,7 @@ public class DBManager {
         PreparedStatement ps = null;
         Connection con = null;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(CHANGE_USER_STATUS);
             ps.setString(1, status.toString().toLowerCase());
             ps.setInt(2, id);
@@ -845,16 +872,16 @@ public class DBManager {
 
     /**
      * Cancels payment
+     *
      * @param payment
      * @return operation result
      */
-    public boolean cancelPayment(Payment payment)
-    {
+    public boolean cancelPayment(Payment payment) {
         PreparedStatement ps = null;
         Connection con = null;
         boolean result = false;
         try {
-            con = dbManager.getConnection();
+            con = getConnection();
             ps = con.prepareStatement(CANCEL_PAYMENT);
             ps.setInt(1, payment.getId());
             if (ps.executeUpdate() == 1) {
@@ -872,30 +899,79 @@ public class DBManager {
 
     /**
      * Updates card name
+     *
      * @param card
      * @param newName
      * @return operation result
      */
-    public boolean changeCardName(Card card, String newName)
-    {
-        boolean result=false;
-        Connection con =null;
+    public boolean changeCardName(Card card, String newName) {
+        boolean result = false;
+        Connection con = null;
         PreparedStatement ps = null;
-        try{
-            con = dbManager.getConnection();
+        try {
+            con = getConnection();
             ps = con.prepareStatement(CHANGE_CARD_NAME);
-            ps.setString(1,newName);
-            ps.setInt(2,card.getCardID());
+            ps.setString(1, newName);
+            ps.setInt(2, card.getCardID());
             int count = ps.executeUpdate();
-            if(count==1)
-            {
-                result=true;
+            if (count == 1) {
+                result = true;
             }
-        }catch (SQLException exception)
-        {
+        } catch (SQLException exception) {
             LOG.trace("Cannot change card name");
         }
         return result;
+    }
+
+    public List<Payment> getSentPayments(Card card) {
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        List<Payment> payments = new ArrayList<>();
+        try {
+            con = getConnection();
+            ps = con.prepareStatement(GET_PAYMENTS_IN);
+            ps.setInt(1, card.getCardID());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Calendar c1 = Calendar.getInstance();
+                c1.setTime(rs.getDate(4));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()), rs.getInt(8));
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(rs.getDate(12));
+                Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()), rs.getInt(16));
+                Calendar paymentDate = Calendar.getInstance();
+                String textDate = rs.getString(17);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                java.util.Date date = sdf.parse(textDate);
+                paymentDate.setTime(date);
+                payments.add(new Payment(rs.getInt(20), cardFrom, cardto, paymentDate, rs.getDouble(18), PaymentStatus.valueOf(rs.getString(19).toUpperCase())));
+            }
+            ps = con.prepareStatement(GET_SENT_PAYMENTS_OUT);
+            ps.setInt(1, card.getCardID());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Calendar c1 = Calendar.getInstance();
+                c1.setTime(rs.getDate(4));
+                Card cardFrom = new Card(rs.getInt(1), rs.getString(2), rs.getString(3), c1, rs.getInt(5), rs.getDouble(6), Status.valueOf(rs.getString(7).toUpperCase()), rs.getInt(8));
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(rs.getDate(12));
+                Card cardto = new Card(rs.getInt(9), rs.getString(10), rs.getString(11), c2, rs.getInt(13), rs.getDouble(14), Status.valueOf(rs.getString(15).toUpperCase()), rs.getInt(16));
+                Calendar paymentDate = Calendar.getInstance();
+                String textDate = rs.getString(17);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                java.util.Date date = sdf.parse(textDate);
+                paymentDate.setTime(date);
+                payments.add(new Payment(rs.getInt(20), cardFrom, cardto, paymentDate, rs.getDouble(18), PaymentStatus.valueOf(rs.getString(19).toUpperCase())));
+            }
+
+        } catch (SQLException | ParseException exception) {
+            LOG.warn(Message.CANNOT_OBTAIN_CARDS);
+
+        } finally {
+            close(con, ps, rs);
+        }
+        return payments;
     }
 
 }

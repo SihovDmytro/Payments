@@ -12,5 +12,11 @@
             responsive: true
         } );
         new $.fn.dataTable.FixedHeader( table );
+
+        var table2 = $('#mydatatable2').DataTable( {
+            responsive: true
+        } );
+        new $.fn.dataTable.FixedHeader( table2 );
     } );
+
 </script>

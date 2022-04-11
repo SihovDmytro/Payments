@@ -25,15 +25,6 @@ public class LoginCommand implements Command {
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-//        try {
-//            PasswordHash.hash("123456");
-//            PasswordHash.hash("__  asd");
-//            PasswordHash.hash("пароль");
-//            PasswordHash.hash("asdasda");
-//            PasswordHash.hash("      ");
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
         LOG.debug("LoginCommand starts");
         HttpSession session = request.getSession();
         ResourceBundle rb = (ResourceBundle) request.getServletContext().getAttribute("resBundle");

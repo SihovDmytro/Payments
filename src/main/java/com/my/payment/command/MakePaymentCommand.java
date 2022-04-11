@@ -2,14 +2,12 @@ package com.my.payment.command;
 
 import com.my.payment.constants.MailType;
 import com.my.payment.constants.Message;
+import com.my.payment.constants.NumericConstants;
 import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.PaymentStatus;
-import com.my.payment.db.Status;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.Payment;
-import com.my.payment.db.entity.User;
-import com.my.payment.util.Serializor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,13 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Make payment command
+ *
  * @author Sihov Dmytro
  */
 public class MakePaymentCommand implements Command {
@@ -66,12 +64,12 @@ public class MakePaymentCommand implements Command {
             return forward;
         }
         boolean valid = true;
-        if (!checkNumber(numberTo)) {
+        if (!validateNumber(numberTo)) {
             LOG.trace(Message.INVALID_CARD_NUMBER);
             session.setAttribute("invalidCardToNumber", rb.getString("message.invNumber"));
             valid = false;
         }
-        if (!checkAmount(amount, card)) {
+        if (!validateAmount(amount, card)) {
             LOG.trace(Message.INVALID_AMOUNT);
             if (card.getBalance() >= amount)
                 session.setAttribute("invalidAmount", rb.getString("message.invAmount"));
@@ -89,9 +87,9 @@ public class MakePaymentCommand implements Command {
             Payment payment = new Payment(card, dbManager.getCardByNumber(numberTo), Calendar.getInstance(), amount, ps);
             LOG.trace("Formed payment ==> " + payment);
             if (ps == PaymentStatus.SENT) {
-                int newPaymentID=dbManager.makePayment(payment);
-                LOG.trace("newPaymentID ==> "+newPaymentID);
-                if (newPaymentID!=0) {
+                int newPaymentID = dbManager.makePayment(payment);
+                LOG.trace("newPaymentID ==> " + newPaymentID);
+                if (newPaymentID != 0) {
 
                     LOG.trace("Transaction complete ");
                     session.setAttribute("resultTitle", "Success");
@@ -99,11 +97,11 @@ public class MakePaymentCommand implements Command {
                     request.setAttribute("mailType", MailType.PAYMENT);
                     request.setAttribute("paymentID", newPaymentID);
                     try {
-                        new SendEmailCommand().execute(request,response);
-                    }catch (IOException | ServletException exception){
+                        new SendEmailCommand().execute(request, response);
+                    } catch (IOException | ServletException exception) {
                         LOG.trace("Cannot send email");
                     }
-                    forward=Path.RESULT_PAGE;
+                    forward = Path.RESULT_PAGE;
 
                 } else {
                     LOG.warn("Payment error");
@@ -128,20 +126,20 @@ public class MakePaymentCommand implements Command {
         return forward;
     }
 
-    private boolean checkAmount(double amount, Card card) {
+    private boolean validateAmount(double amount, Card card) {
         boolean check = true;
-        if (amount < 1 || amount > 999999999)
+        if (amount < NumericConstants.MIN_AMOUNT || amount > NumericConstants.MAX_AMOUNT)
             check = false;
 
         return card.getBalance() >= amount && check;
     }
 
-    private boolean checkNumber(String txt) {
+    private boolean validateNumber(String txt) {
         if (txt == null) return false;
         Pattern p = Pattern.compile("^\\d{16}$");
         Matcher m = p.matcher(txt);
         DBManager dbManager = DBManager.getInstance();
-        return m.find() && txt.length() == 16 && dbManager.getCardByNumber(txt) != null;
+        return m.find() && txt.length() == NumericConstants.NUMBER_LENGTH && dbManager.getCardByNumber(txt) != null;
     }
 
 }

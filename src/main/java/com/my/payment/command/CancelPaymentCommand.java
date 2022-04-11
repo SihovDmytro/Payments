@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 /**
  * Cancel payment command
  */
-public class CancelPaymentCommand implements Command{
+public class CancelPaymentCommand implements Command {
     private static final Logger LOG = LogManager.getLogger(CancelPaymentCommand.class);
 
     @Override
@@ -32,8 +32,9 @@ public class CancelPaymentCommand implements Command{
         try {
             LOG.trace("paymentID parameter ==> " + request.getParameter("paymentID"));
             paymentID = Integer.parseInt(request.getParameter("paymentID"));
-        } catch (NumberFormatException exception) {
+        } catch (Exception exception) {
             LOG.warn("Cannot parse paymentID");
+
             session.setAttribute("ErrorMessage", rb.getString("message.cannotCancelPay"));
             return forward;
         }

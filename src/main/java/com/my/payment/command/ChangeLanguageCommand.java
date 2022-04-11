@@ -31,7 +31,6 @@ public class ChangeLanguageCommand implements Command {
         ResourceBundle rb = ResourceBundle.getBundle("localization", locale);
         request.getServletContext().setAttribute("resBundle", rb);
         LOG.trace("resBundle ==> " + rb);
-
         session.setAttribute("resultTitle", rb.getString("message.success"));
         session.setAttribute("resultMessage", rb.getString("message.langChange"));
         return Path.RESULT_PAGE;
