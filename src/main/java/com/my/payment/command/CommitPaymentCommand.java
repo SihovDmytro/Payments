@@ -6,6 +6,7 @@ import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.PaymentStatus;
 import com.my.payment.db.entity.Payment;
+import com.my.payment.threads.SendEmailThread;
 import com.mysql.cj.protocol.PacketReceivedTimeHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,11 +62,7 @@ public class CommitPaymentCommand implements Command {
             session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
             request.setAttribute("mailType", MailType.PAYMENT);
             request.setAttribute("paymentID",payment.getId());
-            try {
-                new SendEmailCommand().execute(request,response);
-            }catch (IOException | ServletException exception){
-                LOG.trace("Cannot send email");
-            }
+            new SendEmailThread(request,response).start();
             forward = Path.RESULT_PAGE;
         } else {
             LOG.warn("Payment error");

@@ -77,7 +77,6 @@ public class GenerateReport implements Command{
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,params);
             JasperExportManager.exportReportToPdfFile(jasperPrint, pathPdf);
             forward=Path.RECEIPT_PAGE;
-
         } catch (JRException e) {
             LOG.trace("Cannot generate report");
 

@@ -7,6 +7,7 @@ import com.my.payment.db.DBManager;
 import com.my.payment.db.Role;
 import com.my.payment.db.Status;
 import com.my.payment.db.entity.User;
+import com.my.payment.threads.SendEmailThread;
 import com.my.payment.util.PasswordHash;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,7 +88,8 @@ public class RegistrationCommand implements Command {
                 request.setAttribute("currUser",user);
                 request.setAttribute("mailType", MailType.REGISTRATION);
                 try {
-                    new SendEmailCommand().execute(request, response);
+                    new SendEmailThread(request, response).start();
+                    forward = Path.REGISTRATION_PAGE;
                 }catch (Exception exception){
                     logger.trace("Cannot send email");
                 }
