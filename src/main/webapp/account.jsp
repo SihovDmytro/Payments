@@ -14,6 +14,12 @@
             <span><fmt:message key="label.login" /></span>:
             ${sessionScope.currUser.login}
             <hr>
+            <span><fmt:message key="label.fullName" /></span>:
+            ${sessionScope.currUser.fullName}
+            <hr>
+            <span><fmt:message key="label.birth" /></span>:
+            ${sessionScope.currUser.textDate}
+            <hr>
             <span ><fmt:message key="label.email"/></span>:
             ${sessionScope.currUser.email}
             <hr>

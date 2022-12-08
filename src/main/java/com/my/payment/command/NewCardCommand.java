@@ -75,9 +75,9 @@ public class NewCardCommand implements Command {
                 return Path.NEW_CARD_PAGE;
             }
             User user = (User) session.getAttribute("currUser");
-            if (dbManager.findCard(card, user)) {
+            if (dbManager.findCard(card)) {
                 LOG.trace(Message.CARD_ALREADY_ADDED);
-                session.setAttribute("alreadyAdded", rb.getString("message.cardAdded"));
+                session.setAttribute("alreadyAdded", rb.getString("message.cardIsNotAvailable"));
                 return Path.NEW_CARD_PAGE;
             }
             if (card.getDate().equals(calendar) && card.getPin() == Integer.parseInt(pin) && card.getCvv() == Integer.parseInt(cvv)) {

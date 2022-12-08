@@ -33,6 +33,7 @@ public class CommandContainer {
         commands.put("cancelPayment", new CancelPaymentCommand());
         commands.put("changeCardName", new ChangeCardNameCommand());
         commands.put("generateReport", new GenerateReport());
+        commands.put("getUserPage", new GetUserPageCommand());
 
     }
 

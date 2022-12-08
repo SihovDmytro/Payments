@@ -77,7 +77,7 @@ public class CreateCardCommand implements Command{
                 session.setAttribute("alreadyExist", rb.getString("message.numberExists"));
                 return Path.CREATE_CARD_PAGE;
             }
-            if(dbManager.createNewCard(card,user))
+            if(dbManager.createNewCard(card))
             {
                 LOG.trace(Message.CARD_ADD_SUCCESS);
                 session.setAttribute("isSuccess",rb.getString("message.cardAdded"));

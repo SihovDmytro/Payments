@@ -6,6 +6,7 @@ import com.my.payment.constants.Path;
 import com.my.payment.db.DBManager;
 import com.my.payment.db.Role;
 import com.my.payment.db.Status;
+import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.User;
 import com.my.payment.threads.SendEmailThread;
 import com.my.payment.util.PasswordHash;
@@ -18,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +47,10 @@ public class RegistrationCommand implements Command {
         logger.trace("Request parameter pass ==> " + pass);
         String passR = request.getParameter("pass-repeat");
         logger.trace("Request parameter pass-repeat ==> " + passR);
+        String fullName = request.getParameter("fullName");
+        logger.trace("Request parameter fullName ==> " + fullName);
+        String birth = request.getParameter("birth");
+        logger.trace("Request parameter birth ==> " + birth);
         String forward = Path.REGISTRATION_PAGE;
         HttpSession session = request.getSession();
         if (!checkEmail(email)) {
@@ -66,6 +73,11 @@ public class RegistrationCommand implements Command {
             session.setAttribute("repeatPVal", rb.getString("message.difPass"));
             continueReg = false;
         }
+        if (!checkDate(birth)) {
+            logger.trace(Message.INVALID_EXPIRATION_DATE);
+            session.setAttribute("invalidDate", "Неправильний фомат дати");
+            continueReg = false;
+        }
         DBManager dbManager = DBManager.getInstance();
         if (dbManager.findUser(login) != null) {
             logger.warn(Message.LOGIN_EXISTS);
@@ -80,19 +92,17 @@ public class RegistrationCommand implements Command {
             continueReg = false;
         }
         if (continueReg) {
-            User user = new User(login, Role.USER, pass, email, Status.ACTIVE);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(Date.valueOf(birth));
+            User user = new User(login, Role.USER, pass, email, Status.ACTIVE, fullName, calendar);
             logger.warn("Formed user ==> " + user);
             if (dbManager.addUser(user)) {
                 logger.warn(Message.USER_CREATED);
                 session.setAttribute("isSuccess", rb.getString("message.userCreate"));
-                request.setAttribute("currUser",user);
+                request.setAttribute("currUser", user);
                 request.setAttribute("mailType", MailType.REGISTRATION);
-                try {
-                    new SendEmailThread(request, response).start();
-                    forward = Path.REGISTRATION_PAGE;
-                }catch (Exception exception){
-                    logger.trace("Cannot send email");
-                }
+                forward = Path.REGISTRATION_PAGE;
+
             } else {
                 session.setAttribute("isSuccess", rb.getString("message.cannotCreateUser"));
             }
@@ -119,5 +129,22 @@ public class RegistrationCommand implements Command {
     private boolean checkPass(String text) {
         if (text == null) return false;
         return text.length() <= 45 && text.length() > 5;
+    }
+
+    private boolean checkDate(String txt) {
+        if (txt == null) return false;
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(Date.valueOf(txt));
+            int year = calendar.get(Calendar.YEAR);
+            int currYear = Calendar.getInstance().get(Calendar.YEAR);
+            return currYear >= year && currYear - year < 150;
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    private boolean checkFullName(String fullName) {
+        return fullName != null && fullName.length() < 80;
     }
 }

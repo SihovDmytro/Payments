@@ -1,11 +1,13 @@
-<tr>
-    <td class="right">
-        <form action=controller method="post">
-            <input type="hidden" name="command" value="changeLocale">
-            <select id="language" name="language" onchange="this.form.submit()">
-                <option value="ru_RU" ${applicationScope.language eq "ru_RU" ? 'selected': ''}><fmt:message key='lang.ru'/></option>
-                <option value="en_US" ${applicationScope.language eq "en_US" ? 'selected': ''}><fmt:message key='lang.en'/></option>
-            </select>
-        </form>
-    </td>
-</tr>
+<div class="change-lang">
+    <form action=controller method="post">
+        <input type="hidden" name="command" value="changeLocale">
+        <select id="language" name="language" onchange="this.form.submit()">
+            <option value="ru_RU" ${applicationScope.language eq "ru_RU" ? 'selected': ''}><fmt:message
+                    key='lang.ru'/></option>
+            <option value="en_US" ${applicationScope.language eq "en_US" ? 'selected': ''}><fmt:message
+                    key='lang.en'/></option>
+            <option value="uk_UA" ${applicationScope.language eq "uk_UA" ? 'selected': ''}><fmt:message
+                    key='lang.ua'/></option>
+        </select>
+    </form>
+</div>

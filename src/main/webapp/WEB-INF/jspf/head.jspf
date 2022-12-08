@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.bootstrap.min.css">
     <link rel="stylesheet" href=" https://cdn.datatables.net/responsive/2.2.6/css/responsive.bootstrap.min.css">
-    <link href="MyStyle.css" rel = "stylesheet" media="screen" type="text/css">
+    <link href="main.css" rel = "stylesheet" media="screen" type="text/css">
     <c:choose>
         <c:when test="${not empty applicationScope.language}">
             <c:if test="${applicationScope.language eq 'ru_RU'}">
@@ -15,6 +15,9 @@
             </c:if>
             <c:if test="${applicationScope.language eq 'en_US'}">
                 <fmt:setBundle basename="localization_en_US"/>
+            </c:if>
+            <c:if test="${applicationScope.language eq 'uk_UA'}">
+            <fmt:setBundle basename="localization_uk_UA"/>
             </c:if>
         </c:when>
         <c:otherwise>

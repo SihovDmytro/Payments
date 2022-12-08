@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 /**
  * Change locale command
+ *
  * @author Sihov Dmytro
  */
 public class ChangeLanguageCommand implements Command {
@@ -26,13 +27,14 @@ public class ChangeLanguageCommand implements Command {
         LOG.trace("lang parameter ==> " + lang);
         request.getServletContext().setAttribute("language", lang);
         HttpSession session = request.getSession();
-        Locale locale = new Locale(lang);
-
+        Locale locale = new Locale(lang.split("_")[0], lang.split("_")[1]);
+        LOG.trace("locale ==> " + locale.getLanguage());
         ResourceBundle rb = ResourceBundle.getBundle("localization", locale);
         request.getServletContext().setAttribute("resBundle", rb);
         LOG.trace("resBundle ==> " + rb);
         session.setAttribute("resultTitle", rb.getString("message.success"));
         session.setAttribute("resultMessage", rb.getString("message.langChange"));
+        LOG.trace("title: " + session.getAttribute("resultMessage"));
         return Path.RESULT_PAGE;
     }
 }

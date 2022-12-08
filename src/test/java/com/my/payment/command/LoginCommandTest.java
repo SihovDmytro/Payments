@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +47,7 @@ public class LoginCommandTest {
         when(request.getParameter("pass")).thenReturn("testpass");
         dbManagerStatic.when(DBManager::getInstance).thenReturn(dbManager);
         when(dbManager.try2Login("test", PasswordHash.hash("testpass"))).thenReturn(true);
-        User user = new User("test", Role.USER, PasswordHash.hash("testpass"), "1234567899876543", Status.ACTIVE);
+        User user = new User("test", Role.USER, PasswordHash.hash("testpass"), "1234567899876543", Status.ACTIVE, "Dmytro", Calendar.getInstance());
         when(dbManager.findUser(anyString())).thenReturn(user);
 
         new LoginCommand().execute(request, response);

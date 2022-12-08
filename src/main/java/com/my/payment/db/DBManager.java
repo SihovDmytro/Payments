@@ -4,6 +4,7 @@ import com.my.payment.constants.Message;
 import com.my.payment.db.entity.Card;
 import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
+import com.my.payment.util.DateAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,18 +23,18 @@ import java.util.*;
  */
 public class DBManager {
     private static final Logger LOG = LogManager.getLogger(DBManager.class);
-    private static final String FIND_USER = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status FROM user u join roles r on u.roles_id=r.id WHERE login=?";
-    private static final String ADD_USER = "INSERT INTO user (login, roles_id, pass, email, status) VALUES (?,?,?,?,?)";
+    private static final String FIND_USER = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status, u.fullName, u.birth FROM user u join roles r on u.roles_id=r.id WHERE u.login=?";
+    private static final String ADD_USER = "INSERT INTO user (login, roles_id, pass, email, status, fullName, birth) VALUES (?,?,?,?,?,?,?)";
     private static final String TRY_TO_LOGIN = "SELECT * FROM user WHERE BINARY login=? AND BINARY pass=?";
     private static final String GET_CARDS_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status,c.pin FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE u.id=?";
-    private static final String GET_CARD_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status,c.pin FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE u.id=? AND c.id=?";
+    private static final String GET_CARD_FOR_USER = "SELECT c.id, c.name,c.number,c.end_date,c.cvv,c.balance,c.status,c.pin FROM user_has_card uhc JOIN user u on uhc.user_id=u.id JOIN card c on uhc.card_id=c.id WHERE c.id=?";
     private static final String GET_ALL_CARDS = "SELECT * FROM card";
     private static final String GET_CARD = "SELECT * FROM card WHERE number=? AND end_date=? AND cvv=?";
     private static final String CREATE_NEW_CARD = "INSERT INTO card(name, number,end_date,cvv,balance,status,pin) VALUES(?,?,date_add(curdate(), interval 5 YEAR),?,0,'active',?); ";
     private static final String ADD_CARD = "INSERT INTO user_has_card(user_id,card_id) VALUES(?,?)";
     private static final String GET_PAYMENTS_IN = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c1.id=? AND p.status='sent' ORDER BY p.date DESC;";
     private static final String GET_PAYMENTS_OUT = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c2.id=? ORDER BY p.date DESC";
-    private static final String GET_USERS = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status FROM user u join roles r on u.roles_id=r.id";
+    private static final String GET_USERS = "SELECT u.id, u.login, r.name, u.pass, u.email, u.status, u.fullName, u.birth FROM user u join roles r on u.roles_id=r.id";
     private static final String GET_CARD_BY_ID = "SELECT * FROM card WHERE id=?";
     private static final String GET_CARD_BY_NUMBER = "SELECT * FROM card WHERE number=?";
     private static final String MAKE_PAYMENT = "INSERT INTO payment(card_id_from,card_id_to, date,amount,status) values(?,?,?,?,?)";
@@ -44,6 +45,7 @@ public class DBManager {
     private static final String COMMIT_PAYMENT = "UPDATE payment SET status='sent', date=current_timestamp()  WHERE id=?";
     private static final String CANCEL_PAYMENT = "DELETE FROM payment WHERE (id = ?)";
     private static final String CHANGE_CARD_NAME = "UPDATE card SET name=? WHERE id=?";
+    private static final String GET_OWNER="SELECT u.id, u.login, r.name, u.pass, u.email, u.status, u.fullName, u.birth FROM user_has_card uhc join user u on uhc.user_id = u.id join roles r on u.roles_id=r.id where uhc.card_id = ?";
 
     private static final String GET_SENT_PAYMENTS_OUT = "SELECT c2.*,c1.*, p.date, p.amount, p.status,p.id FROM payment p JOIN card c1 on c1.id  = p.card_id_to join card c2 on c2.id = p.card_id_from WHERE c2.id=? AND p.status='sent' ORDER BY p.date DESC";
     private static DBManager dbManager;
@@ -100,6 +102,12 @@ public class DBManager {
      * @return instance of DBManager
      */
     public static synchronized DBManager getInstance() {
+        if (dbManager == null) {
+            dbManager = new DBManager();
+        }
+        return dbManager;
+    }
+    public static DBManager instanceDBM() {
         if (dbManager == null) {
             dbManager = new DBManager();
         }
@@ -185,10 +193,14 @@ public class DBManager {
             ps.setString(1, login);
             rs = ps.executeQuery();
             if (rs.next()) {
-                return new User(rs.getInt(1), rs.getString(2), Role.valueOf(rs.getString(3).toUpperCase()), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()));
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(8).getTime());
+                User user = new User(rs.getInt(1), rs.getString(2), Role.valueOf(rs.getString(3).toUpperCase()), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()), rs.getString(7), c);
+                LOG.debug("user: " + user);
+                return user;
             }
         } catch (SQLException exception) {
-            LOG.warn(Message.CANNOT_FIND_USER);
+            LOG.warn(Message.CANNOT_FIND_USER, exception);
         } finally {
             close(con, ps, rs);
         }
@@ -212,6 +224,8 @@ public class DBManager {
             ps.setString(3, user.getPassword());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getStatus().toString());
+            ps.setString(6, user.getFullName());
+            ps.setTimestamp(7, new Timestamp(user.getBirth().getTimeInMillis()));
             int count = ps.executeUpdate();
             if (count > 0) return true;
         } catch (SQLException exception) {
@@ -401,10 +415,9 @@ public class DBManager {
      * Inserts a new card
      *
      * @param card
-     * @param user
      * @return operation result
      */
-    public boolean createNewCard(Card card, User user) {
+    public boolean createNewCard(Card card) {
         PreparedStatement ps = null;
         Connection con = null;
         ResultSet rs = null;
@@ -421,12 +434,14 @@ public class DBManager {
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
 //                LOG.trace("generatedKey ==> " + rs.getInt(1));
-                card.setCardID(rs.getInt(1));
-                if (addNewCard(card, user, con)) {
-                    LOG.trace("Add card");
-                    con.commit();
-                    result = true;
-                }
+//                card.setCardID(rs.getInt(1));
+//                if (addNewCard(card, user, con)) {
+//                    LOG.trace("Add card");
+//                    con.commit();
+//                    result = true;
+//                }
+                result = true;
+                con.commit();
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_CARDS);
@@ -447,10 +462,9 @@ public class DBManager {
      * Checks if user already have this card
      *
      * @param card
-     * @param user
      * @return operation result
      */
-    public boolean findCard(Card card, User user) {
+    public boolean findCard(Card card) {
         PreparedStatement ps = null;
         Connection con = null;
         ResultSet rs = null;
@@ -458,8 +472,7 @@ public class DBManager {
         try {
             con = getConnection();
             ps = con.prepareStatement(GET_CARD_FOR_USER);
-            ps.setInt(1, user.getUserID());
-            ps.setInt(2, card.getCardID());
+            ps.setInt(1, card.getCardID());
             rs = ps.executeQuery();
             if (rs.next()) {
                 result = true;
@@ -831,7 +844,9 @@ public class DBManager {
             s = con.createStatement();
             rs = s.executeQuery(GET_USERS);
             while (rs.next()) {
-                users.add(new User(rs.getInt(1), rs.getString(2), Role.valueOf(rs.getString(3).toUpperCase()), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase())));
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getDate(8).getTime());
+                users.add(new User(rs.getInt(1), rs.getString(2), Role.valueOf(rs.getString(3).toUpperCase()), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()), rs.getString(7), c));
             }
         } catch (SQLException exception) {
             LOG.warn(Message.CANNOT_OBTAIN_USERS);
@@ -972,6 +987,31 @@ public class DBManager {
             close(con, ps, rs);
         }
         return payments;
+    }
+
+    public User getOwner(Card card) {
+        User user = null;
+        PreparedStatement ps = null;
+        Connection con = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            ps = con.prepareStatement(GET_OWNER);
+            ps.setInt(1, card.getCardID());
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(8).getTime());
+                user = new User(rs.getInt(1), rs.getString(2), Role.valueOf(rs.getString(3).toUpperCase()), rs.getString(4), rs.getString(5), Status.valueOf(rs.getString(6).toUpperCase()), rs.getString(7), c);
+                LOG.debug("user: " + user);
+                return user;
+            }
+        } catch (SQLException exception) {
+            LOG.warn("Cannot find owner", exception);
+        } finally {
+            close(con, ps, rs);
+        }
+        return user;
     }
 
 }

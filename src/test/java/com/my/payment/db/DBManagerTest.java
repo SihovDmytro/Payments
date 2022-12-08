@@ -5,12 +5,14 @@ import com.my.payment.db.entity.Payment;
 import com.my.payment.db.entity.User;
 import com.my.payment.util.PasswordHash;
 import org.junit.jupiter.api.*;
+
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -114,7 +116,7 @@ class DBManagerTest {
     public void addUser() throws SQLException {
         when(ps.executeUpdate()).thenReturn(1);
         when(dbM.addUser(any())).thenCallRealMethod();
-        User user = new User("namdasdae", Role.USER, "123321123123", "1234567899876543", Status.ACTIVE);
+        User user = new User("namdasdae", Role.USER, "123321123123", "1234567899876543", Status.ACTIVE, "dmytro", Calendar.getInstance());
         boolean check = dbM.addUser(user);
 
         assertTrue(check);
@@ -156,7 +158,7 @@ class DBManagerTest {
     @Test
     public void createNewCard() throws SQLException {
         when(rs.next()).thenReturn(true);
-        when(dbM.createNewCard(any(), any())).thenCallRealMethod();
+        when(dbM.createNewCard(any())).thenCallRealMethod();
         doNothing().when(con).commit();
         when(con.prepareStatement(anyString(), anyInt())).thenReturn(ps);
         when(con.prepareStatement(anyString())).thenReturn(ps);
@@ -164,9 +166,9 @@ class DBManagerTest {
         when(ps.getGeneratedKeys()).thenReturn(rs);
         when(rs.getInt(1)).thenReturn(1);
 
-        User user = new User("namdasdae", Role.USER, "123321123123", "1234567899876543", Status.ACTIVE);
+        User user = new User("namdasdae", Role.USER, "123321123123", "1234567899876543", Status.ACTIVE, "dmytro", Calendar.getInstance());
         Card card = new Card("название", "1999567899876543", Calendar.getInstance(), 1, 0, Status.ACTIVE, 1);
-        boolean check = dbM.createNewCard(card, user);
+        boolean check = dbM.createNewCard(card);
         assertTrue(check);
 
         verify(dbM, times(1)).getConnection();
@@ -185,11 +187,11 @@ class DBManagerTest {
     @Test
     public void findCard() throws SQLException {
         when(rs.next()).thenReturn(true);
-        when(dbM.findCard(any(), any())).thenCallRealMethod();
+        when(dbM.findCard(any())).thenCallRealMethod();
 
-        User user = new User("namdasdae", Role.USER, "123321123123", "1234567899876543", Status.ACTIVE);
+
         Card card = new Card("название", "1999567899876543", Calendar.getInstance(), 1, 0, Status.ACTIVE, 1);
-        boolean check = dbM.findCard(card, user);
+        boolean check = dbM.findCard(card);
         assertTrue(check);
 
         verify(dbM, times(1)).getConnection();
@@ -355,7 +357,7 @@ class DBManagerTest {
     @Test
     public void makePayment() throws SQLException {
         when(dbM.makePayment(any())).thenCallRealMethod();
-        when(con.prepareStatement(anyString(),anyInt())).thenReturn(ps);
+        when(con.prepareStatement(anyString(), anyInt())).thenReturn(ps);
         when(ps.getGeneratedKeys()).thenReturn(rs);
         when(rs.getInt(1)).thenReturn(1);
         when(rs.next()).thenReturn(true);
@@ -366,15 +368,15 @@ class DBManagerTest {
         Card card2 = new Card("название2", "1111222233334444", Calendar.getInstance(), 1234, 123, Status.ACTIVE, 321);
         Payment payment = new Payment(card1, card2, Calendar.getInstance(), 100.50, PaymentStatus.PREPARED);
         int result = dbM.makePayment(payment);
-        assertEquals(result,1);
+        assertEquals(result, 1);
 
         verify(dbM, times(1)).getConnection();
         verify(con, times(1)).setAutoCommit(false);
         verify(con, times(2)).prepareStatement(anyString());
-        verify(con, times(1)).prepareStatement(anyString(),anyInt());
+        verify(con, times(1)).prepareStatement(anyString(), anyInt());
         verify(con, times(1)).setAutoCommit(false);
         verify(ps, times(3)).executeUpdate();
-        verify(rs,times(1)).next();
+        verify(rs, times(1)).next();
         verify(ps, times(3)).setDouble(anyInt(), anyDouble());
         verify(ps, times(4)).setInt(anyInt(), anyInt());
         verify(ps, times(1)).setTimestamp(anyInt(), any());

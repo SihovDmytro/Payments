@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,13 +51,13 @@ class RegistrationCommandTest {
         when(request.getParameter("pass-repeat")).thenReturn("testpass");
         when(request.getParameter("pass")).thenReturn("testpass");
         dbManagerStatic.when(DBManager::getInstance).thenReturn(dbManager);
-        User user = new User("test", Role.USER, PasswordHash.hash("testpass"), "1234567899876543", Status.ACTIVE);
+        User user = new User("test", Role.USER, PasswordHash.hash("testpass"), "1234567899876543", Status.ACTIVE, "dmytro", Calendar.getInstance());
         when(dbManager.findUser(anyString())).thenReturn(null);
         when(dbManager.addUser(any())).thenReturn(true);
 
         new RegistrationCommand().execute(request, response);
 
-        verify(request, times(2)).getSession();
+        verify(request, times(1)).getSession();
         verify(request, times(2)).getServletContext();
         verify(context, times(2)).getAttribute(anyString());
         verify(request, times(4)).getParameter(anyString());

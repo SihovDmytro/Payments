@@ -97,7 +97,6 @@ public class MakePaymentCommand implements Command {
                     session.setAttribute("resultMessage", rb.getString("message.transactionSuccess"));
                     request.setAttribute("mailType", MailType.PAYMENT);
                     request.setAttribute("paymentID", newPaymentID);
-                    new SendEmailThread(request,response).start();
                     forward = Path.RESULT_PAGE;
 
                 } else {
