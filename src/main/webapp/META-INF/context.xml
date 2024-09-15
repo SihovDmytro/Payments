@@ -6,7 +6,7 @@
               defaultTransactionIsolation="READ_COMMITTED"
               defaultAutoCommit="true"
               username="root"
-              password="prl"
+              password="admin"
               driverClassName="com.mysql.cj.jdbc.Driver"
               url="jdbc:mysql://localhost:3306/payments"/>
 </Context>
